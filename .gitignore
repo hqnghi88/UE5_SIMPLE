@@ -80,11 +80,4 @@
 MyProject/Platforms/HoloLens/Config/HoloLensEngine.ini
 MyProject/MyProject.sln.DotSettings.user
 MyProject/MyProject.code-workspace
-MyProject/Windows/
-MyProject/Content/LPSDeluxe2TropicalEnvironment/
-MyProject/Content/__ExternalActors__/
-MyProject/Content/Asian_Village/
-MyProject/Content/CitySampleBuildings/
-MyProject/Content/CitySampleCrowd/
-MyProject/Content/ControlRig/
-MyProject/Content/CitySampleVehicles/
+MyProject/Windows/ 
