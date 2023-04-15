@@ -2,19 +2,21 @@
 
 
 #include "GamaClient.h"
+#include "GamaActions.h"
 #include "WebSocketsModule.h"
 #include "IWebSocket.h"
 #include "Serialization/JsonSerializer.h"
-#include "Containers/Array.h"
-#include "MessageHandler.h"
+#include "Containers/Array.h" 
+#include "Engine/World.h"
 #include "ExpParameter.h"
 #include <string>
 
 GamaClient::GamaClient()
-{
+{    
+    this -> message_handler = this;
 }
 
-GamaClient::GamaClient(FString url, int32 port, MessageHandler* message_handler) 
+GamaClient::GamaClient(FString url, int32 port) 
 {
 
     // Making sure that modules are loaded before using them
@@ -26,11 +28,11 @@ GamaClient::GamaClient(FString url, int32 port, MessageHandler* message_handler)
     {
         FModuleManager::Get().LoadModule("Json");
     }
-    
-    this -> message_handler = message_handler;
+     
     const FString ServerURL = FString("ws://") + url + FString(":") + FString(std::to_string(port).c_str()); // Your server URL. You can use ws, wss or wss+insecure.
     const FString ServerProtocol = FString("ws");              // The WebServer protocol you want to use
     Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
+    this -> message_handler = this;
 }
 
 bool GamaClient::IsConnected() const
@@ -43,7 +45,9 @@ void GamaClient::connect() const
     // We bind all available events
     Socket->OnConnected().AddLambda([]() -> void {
         // This code will run once connected.
-        UE_LOG(LogTemp, Display, TEXT("connected"));
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Successfully!!! connected");
+        UE_LOG(LogTemp, Display, TEXT("connected")); 
+
     });
         
     Socket->OnConnectionError().AddLambda([](const FString & Error) -> void {
@@ -54,6 +58,7 @@ void GamaClient::connect() const
     Socket->OnClosed().AddLambda([](int32 StatusCode, const FString& Reason, bool bWasClean) -> void {
         // This code will run when the connection to the server has been terminated.
         // Because of an error or a call to Socket->Close().
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Connection closed");
         UE_LOG(LogTemp, Display, TEXT("Connection closed"));
     });
         
@@ -71,7 +76,7 @@ void GamaClient::connect() const
             // The deserialization failed, handle this case
             // UE_LOG(LogTemp, Display, TEXT("Unable to deserialize"))
             if (MyJson->GetField<EJson::String>(FString("type")) -> Type != EJson::Null) {
-                message_handler -> HandleCommand(MyJson);
+                 message_handler->HandleCommand(MyJson);
             }
         }
     });
@@ -134,6 +139,7 @@ void GamaClient::load(int64 socket_id, FString file_path, FString experiment_nam
         \"console\": ") + (console ? "true" : "false") + FString(",\
         \"status\": ") + (status ? "true" : "false") + FString(",\
         \"dialog\": ") + (dialog ? "true" : "false") + FString(",\
+        \"runtime\": ") + "false" + FString(",\
         \"parameters\": ") + params + FString(",\
         \"until\": \"") + end_condition + FString("\"\
     }\n") ;
@@ -260,7 +266,7 @@ void GamaClient::reload(int64 socket_id, int32 exp_id, TArray<ExpParameter*> par
     Socket -> Send(reload_command);
 }
 
-void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr) const
+void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, FString act_name) const
 {
     if(!Socket -> IsConnected())
     {
@@ -276,8 +282,120 @@ void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr) const
     }");
 
     Socket -> Send(expression_command);
+    
+    // Socket->OnMessage().Clear();
+    // Socket->OnMessage().AddLambda([&](const FString & Message) -> void { 
+    //     // This code will run when we receive a string message from the server.
+    //     UE_LOG(LogTemp, Display, TEXT("Message received: %s"), *FString(Message));
+
+    //     TSharedPtr<FJsonObject> MyJson;
+
+    //     TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(*Message);
+
+    //     if (FJsonSerializer::Deserialize(Reader, MyJson))
+    //     {
+    //         // The deserialization failed, handle this case
+    //         // UE_LOG(LogTemp, Display, TEXT("Unable to deserialize"))
+    //         if (MyJson->GetField<EJson::String>(FString("type")) -> Type != EJson::Null) { 
+    //             // message_handler -> HandleCommand(act_name, MyJson);
+                
+    //     // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "2connected");
+    //         }
+    //     }
+    // });
+        
 }
 
+void GamaClient::HandleCommand(TSharedPtr<FJsonObject> MyJson)
+{
+    // FHttpResponsePtr Response;
+    FString type;
+
+    if (MyJson->TryGetStringField("type", type))
+    {
+        type = MyJson->GetStringField("type");
+        if (type == "ConnectionSuccessful")
+        {
+            HandleConnectionSuccessful(MyJson);
+        }
+        else if (type == "CommandExecutedSuccessfully")
+        {
+            HandleCommandExecutedSuccessfully( MyJson);
+        }
+    }
+}
+
+int32 GamaClient::GetExpId() const
+{
+    return _exp_id;
+}
+
+int64 GamaClient::GetSocketId() const
+{
+    return _socket_id;
+}
+
+void GamaClient::SetSocketId(int64 ss)
+{
+    _socket_id=ss;
+}
+
+void GamaClient::HandleConnectionSuccessful(TSharedPtr<FJsonObject> MyJson)
+{
+	int64 _socket_id1;
+    if (MyJson->TryGetNumberField("content",  _socket_id1))
+    {
+        _socket_id1 = MyJson->GetIntegerField("content");
+        message_handler->SetSocketId(_socket_id1);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(std::to_string(_socket_id1).c_str()));
+    }
+}
+
+void GamaClient::HandleCommandExecutedSuccessfully(  TSharedPtr<FJsonObject> MyJson)
+{
+    // const TSharedPtr<FJsonObject>* Content;
+    int OutNumber;
+
+    if (MyJson->TryGetNumberField("content", OutNumber))
+    {
+        _exp_id = OutNumber;
+    }
+    // const TSharedPtr<FJsonObject> *bbb;
+    FString ttt;
+    if (MyJson->TryGetStringField("content", ttt))
+    {
+        // FString ttt;
+        // (*bbb)->TryGetStringField("type", ttt);
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(TEXT("content ")) + ttt);
+        // FString ttt;
+        // (*BuildingInfo)->TryGetStringField("type", ttt);
+    }
+    const TSharedPtr<FJsonObject> *Command;
+    if (MyJson->TryGetObjectField("command", Command))
+    {
+        FString CommandName;
+        if ((*Command)->TryGetStringField("type", CommandName) && CommandName.Equals("play"))
+        {
+            // if (client && client->IsConnected())
+            // {
+            //     client->playing = true;
+            // }
+        }
+        // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, CommandName);
+        if ((*Command)->TryGetStringField("type", CommandName) && CommandName.Equals("expression"))
+        {
+            const TSharedPtr<FJsonObject> *BuildingInfo;
+
+            if (MyJson->TryGetObjectField("content", BuildingInfo))
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "sssss");
+                // FString ttt;
+                // (*BuildingInfo)->TryGetStringField("type", ttt);
+            }
+        }
+    }
+}
 GamaClient::~GamaClient()
 {
+    Socket->Close();
 }

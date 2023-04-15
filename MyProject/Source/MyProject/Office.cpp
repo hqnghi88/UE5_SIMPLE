@@ -17,11 +17,11 @@ AOffice::AOffice()
 
 	
 	// Load the building
-	UStaticMesh* mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/Meshes/StaticMesh_office.StaticMesh_office'")).Object;	
-	StaticMesh->SetStaticMesh(mesh);
-	StaticMesh->SetMobility(EComponentMobility::Static);
+	// UStaticMesh* mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/Meshes/StaticMesh_office.StaticMesh_office'")).Object;	
+	// StaticMesh->SetStaticMesh(mesh);
+	// StaticMesh->SetMobility(EComponentMobility::Static);
 	
-	RootComponent = StaticMesh;
+	// RootComponent = StaticMesh;
 	
 }
 

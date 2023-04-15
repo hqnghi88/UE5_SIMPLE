@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GamaClient.h"
+#include "GamaClient.h" 
 #include "ObjectHandler.h"
-#include "GamaActions.generated.h"
+#include "GamaActionsBBox.generated.h"
 
 UCLASS(BlueprintType)
-class MYPROJECT_API AGamaActions : public AActor
+class MYPROJECT_API AGamaActionsBBox : public AActor
 {
 	GENERATED_BODY()
 	
@@ -18,24 +18,16 @@ class MYPROJECT_API AGamaActions : public AActor
 	const FString GAMA_IP		= "127.0.0.1";
 	const int GAMA_SERVER_PORT	= 6868;
 	const uint16 TCP_PORT		= 8000;
-
-	// //Gama server handling
-	// GamaClient* client; 
-
-	// TCP handling
-	FSocket* TcpSocket;
-	//ObjectHandler* ObjHandler;
-	AObjectHandler* ObjHandler;
+ 
 	
 	// Game logic
 	bool first = true;
 	bool last = true;
 	bool played = false;
 	bool tcp_connected = false;
-	
 public:	
 	// Sets default values for this actor's properties
-	AGamaActions();
+	AGamaActionsBBox();
 
 protected:
 	// Called when the game starts or when spawned

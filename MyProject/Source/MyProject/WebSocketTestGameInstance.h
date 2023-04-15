@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "IWebSocket.h"
-
-#include "GamaClient.h"
-#include "GamaActionsMessageHandler.h" 
+#include "IWebSocket.h" 
+#include "ObjectHandler.h"
+#include "GamaClient.h" 
 #include "WebSocketTestGameInstance.generated.h"
 /**
  *
@@ -22,11 +21,16 @@ class MYPROJECT_API UWebSocketTestGameInstance : public UGameInstance
 	const FString GAMA_IP		= "127.0.0.1";
 	const int GAMA_SERVER_PORT	= 6868;
 	const uint16 TCP_PORT		= 8000;
-
+public:
 	//Gama server handling
-	GamaClient* client;
-	GamaActionsMessageHandler* message_handler;
+	GamaClient* client; 
 
+	//ObjectHandler* ObjHandler;
+	AObjectHandler* ObjHandler;
+	// Game logic
+	bool first = true;
+	bool played = false;
+	bool tcp_connected = false;
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;

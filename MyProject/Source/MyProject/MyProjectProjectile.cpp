@@ -39,15 +39,15 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
-		UWebSocketTestGameInstance* GameInstance = Cast<UWebSocketTestGameInstance>(GetGameInstance());
+		// UWebSocketTestGameInstance* GameInstance = Cast<UWebSocketTestGameInstance>(GetGameInstance());
 
-		if (GameInstance)
-		{
-			if (GameInstance->WebSocket->IsConnected())
-			{
-				GameInstance->WebSocket->Send("Hit "+((UPrimitiveComponent*)OtherComp)->GetDetailedInfo());
-			}
-		}
+		// if (GameInstance)
+		// {
+		// 	if (GameInstance->WebSocket->IsConnected())
+		// 	{
+		// 		GameInstance->WebSocket->Send("Hit "+((UPrimitiveComponent*)OtherComp)->GetDetailedInfo());
+		// 	}
+		// }
 		Destroy();
 	}
 }

@@ -15,14 +15,14 @@ APeople::APeople()
 	position.Y = 0;
 	position.Z = 0;
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	// StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
-	// Load the car
-	UStaticMesh* mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_vehicule.SM_vehicule'")).Object;
+	// // Load the car
+	// UStaticMesh* mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_vehicule.SM_vehicule'")).Object;
 
-	StaticMesh->SetStaticMesh(mesh);
-	StaticMesh->SetMobility(EComponentMobility::Movable);
-	RootComponent = StaticMesh;
+	// StaticMesh->SetStaticMesh(mesh);
+	// StaticMesh->SetMobility(EComponentMobility::Movable);
+	// RootComponent = StaticMesh;
 	
 }
 

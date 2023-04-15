@@ -4,21 +4,35 @@
 
 #include "CoreMinimal.h"
 #include "IWebSocket.h"
-#include "Containers/Array.h"
-#include "MessageHandler.h"
+#include "Containers/Array.h" 
 #include "ExpParameter.h"
 
 
 class MYPROJECT_API GamaClient
 {
 private: 
-	TSharedPtr<IWebSocket> Socket;
-	MessageHandler* message_handler;
+	TSharedPtr<IWebSocket> Socket; 
+	GamaClient* message_handler; 
+public:
+	int32 _exp_id;
+	int64 _socket_id;
+	bool playing = false;
 public:
 	GamaClient();
-	GamaClient(FString url, int32 port, MessageHandler* message_handler);
+	GamaClient(FString url, int32 port);
 	void connect() const;
 	bool IsConnected() const;
+	bool IsPlaying() const;
+
+
+	// Get simulation parameters
+	int32 GetExpId() const;
+	int64 GetSocketId() const;
+	void SetSocketId(int64 ss);
+	// Handle commands returned by Json messages
+	void HandleCommand( TSharedPtr<FJsonObject> MyJson);
+	void HandleConnectionSuccessful(TSharedPtr<FJsonObject> MyJson);
+	void HandleCommandExecutedSuccessfully(  TSharedPtr<FJsonObject> MyJson);
 
 	// basic Gama server commands
 	void exit() const;
@@ -29,7 +43,8 @@ public:
 	void stepBack(int64 socket_id, int32 exp_id, int32 steps = 1, bool sync = false) const;
 	void stop(int64 socket_id, int32 exp_id) const;
 	void reload(int64 socket_id, int32 exp_id, TArray<ExpParameter*> parameters = TArray<ExpParameter*>(), FString end_condition = "") const;
-	void expression(int64 socket_id, int32 exp_id, FString expr) const;
+	// void expression(int64 socket_id, int32 exp_id, FString expr) const;
+	void expression(int64 socket_id, int32 exp_id, FString expr, FString act_name) const;
 
 	virtual ~GamaClient();
 };
