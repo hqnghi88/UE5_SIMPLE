@@ -12,10 +12,11 @@ class MYPROJECT_API GamaClient
 {
 private: 
 	TSharedPtr<IWebSocket> Socket; 
-	GamaClient* message_handler; 
 public:
-	int32 _exp_id;
-	int64 _socket_id;
+	GamaClient* message_handler; 
+	int32 _exp_id=0;
+	int64 _socket_id=0;
+	bool connected = false;
 	bool playing = false;
 public:
 	GamaClient();
@@ -23,6 +24,8 @@ public:
 	void connect() const;
 	bool IsConnected() const;
 	bool IsPlaying() const;
+	void SetConnected(bool b);
+	void SetPlaying(bool b);
 
 
 	// Get simulation parameters

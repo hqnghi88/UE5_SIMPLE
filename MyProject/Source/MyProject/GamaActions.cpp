@@ -21,7 +21,7 @@ AGamaActions::AGamaActions()
 void AGamaActions::BeginPlay()
 {
 	Super::BeginPlay();
-	SetActorTickInterval(5); 
+	// SetActorTickInterval(2); 
 	// //ObjHandler = new ObjectHandler();
 
 	// // Spawn an instance of ObjectHandlerr in the map in a place far from the objects
@@ -52,24 +52,23 @@ void AGamaActions::Tick(float DeltaTime)
 	UWebSocketTestGameInstance *GI = Cast<UWebSocketTestGameInstance>(GetGameInstance());
 
 	// UWebSocketTestGameInstance* GI = Cast<UWebSocketTestGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	if (GI && GI->client->IsConnected())
+	if (GI && GI->client->message_handler->IsConnected())
 	{
-
 		// read the model
-		if (first && GI->client->GetSocketId() > 0)
+		if (first && GI->client->message_handler->GetSocketId() > 0)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "loading");
+			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "loading");
 			FString current_path = FPaths::ProjectDir();
 			FString url = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*(current_path + "../MobilityModel/models/Grid Model.gaml"));
 			FString model = "grid_model";
-			GI->client->load(GI->client->GetSocketId(), url, model);
+			GI->client->load(GI->client->message_handler->GetSocketId(), url, model);
 			first = false;
 		}
 
 		// play command
-		if (!played && GI->client->GetExpId() > 0)
+		if (!played && GI->client->message_handler->GetExpId() > 0)
 		{
-			GI->client->play(GI->client->GetSocketId(), GI->client->GetExpId(), true);
+			GI->client->play(GI->client->message_handler->GetSocketId(), GI->client->message_handler->GetExpId(), true);
 			played = true;
 		}
 	}

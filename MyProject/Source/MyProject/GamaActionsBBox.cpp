@@ -22,6 +22,7 @@ void AGamaActionsBBox::BeginPlay()
 {
 	Super::BeginPlay(); 
 
+	// SetActorTickInterval(2); 
 	// // Spawn an instance of ObjectHandlerr in the map in a place far from the objects
 	// UWorld* CurrentWorld = GetWorld();
 	// const FVector* Loc = new FVector(-1000, -1000, -1000);
@@ -49,13 +50,13 @@ void AGamaActionsBBox::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	UWebSocketTestGameInstance *GI = Cast<UWebSocketTestGameInstance>(GetGameInstance());
 
-	if (GI && GI->client->IsConnected())
+	if (GI && GI->client->message_handler->playing)
 	{
 
 		// read the model
 		// if (first && GI->message_handler->GetSocketId() > 0)
 		// {
-        // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "loading");
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "retrieve");
 		// 	FString current_path = FPaths::ProjectDir();
 		// 	FString url = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*(current_path + "../MobilityModel/models/Grid Model.gaml"));
 		// 	FString model = "grid_model";

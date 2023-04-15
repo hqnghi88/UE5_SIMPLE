@@ -14,10 +14,16 @@ void UWebSocketTestGameInstance::Init()
 {
 	Super::Init();
 
-	if (!FModuleManager::Get().IsModuleLoaded("WebSockets"))
-	{
-		FModuleManager::Get().LoadModule("WebSockets");
-	} 
+    // Making sure that modules are loaded before using them
+    if (!FModuleManager::Get().IsModuleLoaded("Websockets"))
+    {
+        FModuleManager::Get().LoadModule("WebSockets");
+    }
+    if (!FModuleManager::Get().IsModuleLoaded("Json"))
+    {
+        FModuleManager::Get().LoadModule("Json");
+    }
+ 
 	client = new GamaClient(GAMA_URL, GAMA_SERVER_PORT);
 	client -> connect();
 	// //ObjHandler = new ObjectHandler();

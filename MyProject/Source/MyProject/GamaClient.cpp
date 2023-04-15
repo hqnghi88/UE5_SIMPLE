@@ -12,42 +12,52 @@
 
 GamaClient::GamaClient()
 {
+    _exp_id = 0;
+    _socket_id = 0;
     this->message_handler = this;
 }
 
 GamaClient::GamaClient(FString url, int32 port)
 {
-
-    // Making sure that modules are loaded before using them
-    if (!FModuleManager::Get().IsModuleLoaded("Websockets"))
-    {
-        FModuleManager::Get().LoadModule("WebSockets");
-    }
-    if (!FModuleManager::Get().IsModuleLoaded("Json"))
-    {
-        FModuleManager::Get().LoadModule("Json");
-    }
+    _exp_id = 0;
+    _socket_id = 0;
 
     const FString ServerURL = FString("ws://") + url + FString(":") + FString(std::to_string(port).c_str()); // Your server URL. You can use ws, wss or wss+insecure.
     const FString ServerProtocol = FString("ws");                                                            // The WebServer protocol you want to use
     Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
-    this->message_handler = this;
+    this->message_handler = new GamaClient();
 }
 
 bool GamaClient::IsConnected() const
 {
-    return Socket->IsConnected();
+    return connected; // Socket->IsConnected();
+}
+bool GamaClient::IsPlaying() const
+{
+    return playing;
+}
+
+void GamaClient::SetConnected(bool b)
+{
+    connected = b;
+}
+
+void GamaClient::SetPlaying(bool b)
+{
+    playing = b;
 }
 
 void GamaClient::connect() const
 {
     // We bind all available events
-    Socket->OnConnected().AddLambda([]() -> void
+    Socket->OnConnected().AddLambda([this]() -> void
                                     {
                                         // This code will run once connected.
                                         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Successfully!!! connected");
-                                        UE_LOG(LogTemp, Display, TEXT("connected"));
-                                    });
+                                        if(message_handler){
+                                            message_handler->SetConnected(true); 
+                                        }
+                                        UE_LOG(LogTemp, Display, TEXT("connected")); });
 
     Socket->OnConnectionError().AddLambda([](const FString &Error) -> void
                                           {
@@ -96,7 +106,7 @@ void GamaClient::connect() const
 
 void GamaClient::exit() const
 {
-    if (!Socket->IsConnected())
+    if (!connected) //! Socket->IsConnected())
     {
         return;
     }
@@ -111,7 +121,7 @@ void GamaClient::exit() const
 
 void GamaClient::load(int64 socket_id, FString file_path, FString experiment_name, bool console, bool status, bool dialog, TArray<ExpParameter *> parameters, FString end_condition) const
 {
-    if (!Socket->IsConnected())
+    if (!message_handler->connected) //! Socket->IsConnected())
     {
         // Don't send if we're not connected.
         UE_LOG(LogTemp, Display, TEXT("Cannot load, not connected"));
@@ -159,7 +169,7 @@ void GamaClient::load(int64 socket_id, FString file_path, FString experiment_nam
 
 void GamaClient::play(int64 socket_id, int32 exp_id, bool sync) const
 {
-    if (!Socket->IsConnected())
+    if (!message_handler->connected) //! Socket->IsConnected())
     {
         return;
     }
@@ -180,7 +190,7 @@ void GamaClient::play(int64 socket_id, int32 exp_id, bool sync) const
 
 void GamaClient::pause(int64 socket_id, int32 exp_id) const
 {
-    if (!Socket->IsConnected())
+    if (!message_handler->connected) //! Socket->IsConnected())
     {
         return;
     }
@@ -199,7 +209,7 @@ void GamaClient::pause(int64 socket_id, int32 exp_id) const
 
 void GamaClient::step(int64 socket_id, int32 exp_id, int32 steps, bool sync) const
 {
-    if (!Socket->IsConnected())
+    if (!message_handler->connected) //! Socket->IsConnected())
     {
         return;
     }
@@ -222,7 +232,7 @@ void GamaClient::step(int64 socket_id, int32 exp_id, int32 steps, bool sync) con
 
 void GamaClient::stepBack(int64 socket_id, int32 exp_id, int32 steps, bool sync) const
 {
-    if (!Socket->IsConnected())
+    if (!message_handler->connected) //! Socket->IsConnected())
     {
         return;
     }
@@ -245,7 +255,7 @@ void GamaClient::stepBack(int64 socket_id, int32 exp_id, int32 steps, bool sync)
 
 void GamaClient::stop(int64 socket_id, int32 exp_id) const
 {
-    if (!Socket->IsConnected())
+    if (!message_handler->connected) //! Socket->IsConnected())
     {
         return;
     }
@@ -264,7 +274,7 @@ void GamaClient::stop(int64 socket_id, int32 exp_id) const
 
 void GamaClient::reload(int64 socket_id, int32 exp_id, TArray<ExpParameter *> parameters, FString end_condition) const
 {
-    if (!Socket->IsConnected())
+    if (!message_handler->connected) //! Socket->IsConnected())
     {
         return;
     }
@@ -296,7 +306,7 @@ void GamaClient::reload(int64 socket_id, int32 exp_id, TArray<ExpParameter *> pa
 
 void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, FString act_name) const
 {
-    if (!Socket->IsConnected())
+    if (!message_handler->connected) //! Socket->IsConnected())
     {
         return;
     }
@@ -380,7 +390,7 @@ void GamaClient::HandleConnectionSuccessful(TSharedPtr<FJsonObject> MyJson)
     {
         _socket_id1 = MyJson->GetIntegerField("content");
         message_handler->SetSocketId(_socket_id1);
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(std::to_string(_socket_id1).c_str()));
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "socket_id");
     }
 }
 
@@ -388,44 +398,45 @@ void GamaClient::HandleCommandExecutedSuccessfully(TSharedPtr<FJsonObject> MyJso
 {
     // const TSharedPtr<FJsonObject>* Content;
     int OutNumber;
- 
+
     if (MyJson->TryGetNumberField("content", OutNumber))
-    { 
+    {
         message_handler->SetExpId(OutNumber);
     }
     // const TSharedPtr<FJsonObject> *bbb;
-    FString ttt;
-    if (MyJson->TryGetStringField("content", ttt))
-    {
-        // FString ttt;
-        // (*bbb)->TryGetStringField("type", ttt);
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(TEXT("content ")) + ttt);
-        // FString ttt;
-        // (*BuildingInfo)->TryGetStringField("type", ttt);
-    }
+    // FString ttt;
+    // if (MyJson->TryGetStringField("content", ttt))
+    // {
+    //     // FString ttt;
+    //     // (*bbb)->TryGetStringField("type", ttt);
+    //     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(TEXT("content ")) + ttt);
+    //     // FString ttt;
+    //     // (*BuildingInfo)->TryGetStringField("type", ttt);
+    // }
     const TSharedPtr<FJsonObject> *Command;
     if (MyJson->TryGetObjectField("command", Command))
     {
         FString CommandName;
         if ((*Command)->TryGetStringField("type", CommandName) && CommandName.Equals("play"))
         {
-            // if (client && client->IsConnected())
-            // {
-            //     client->playing = true;
-            // }
-        }
-        // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, CommandName);
-        if ((*Command)->TryGetStringField("type", CommandName) && CommandName.Equals("expression"))
-        {
-            const TSharedPtr<FJsonObject> *BuildingInfo;
-
-            if (MyJson->TryGetObjectField("content", BuildingInfo))
+            if (message_handler)
             {
-                GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "sssss");
-                // FString ttt;
-                // (*BuildingInfo)->TryGetStringField("type", ttt);
+                GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "playing");
+                message_handler->SetPlaying(true);
             }
         }
+        // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, CommandName);
+        // if ((*Command)->TryGetStringField("type", CommandName) && CommandName.Equals("expression"))
+        // {
+        //     const TSharedPtr<FJsonObject> *BuildingInfo;
+
+        //     if (MyJson->TryGetObjectField("content", BuildingInfo))
+        //     {
+        //         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "sssss");
+        //         // FString ttt;
+        //         // (*BuildingInfo)->TryGetStringField("type", ttt);
+        //     }
+        // }
     }
 }
 GamaClient::~GamaClient()
