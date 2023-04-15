@@ -1,22 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GamaClient.h"
 #include "GamaActions.h"
 #include "WebSocketsModule.h"
 #include "IWebSocket.h"
 #include "Serialization/JsonSerializer.h"
-#include "Containers/Array.h" 
+#include "Containers/Array.h"
 #include "Engine/World.h"
 #include "ExpParameter.h"
 #include <string>
 
 GamaClient::GamaClient()
-{    
-    this -> message_handler = this;
+{
+    this->message_handler = this;
 }
 
-GamaClient::GamaClient(FString url, int32 port) 
+GamaClient::GamaClient(FString url, int32 port)
 {
 
     // Making sure that modules are loaded before using them
@@ -28,41 +27,42 @@ GamaClient::GamaClient(FString url, int32 port)
     {
         FModuleManager::Get().LoadModule("Json");
     }
-     
+
     const FString ServerURL = FString("ws://") + url + FString(":") + FString(std::to_string(port).c_str()); // Your server URL. You can use ws, wss or wss+insecure.
-    const FString ServerProtocol = FString("ws");              // The WebServer protocol you want to use
+    const FString ServerProtocol = FString("ws");                                                            // The WebServer protocol you want to use
     Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
-    this -> message_handler = this;
+    this->message_handler = this;
 }
 
 bool GamaClient::IsConnected() const
 {
-    return Socket -> IsConnected();
+    return Socket->IsConnected();
 }
 
 void GamaClient::connect() const
 {
     // We bind all available events
-    Socket->OnConnected().AddLambda([]() -> void {
-        // This code will run once connected.
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Successfully!!! connected");
-        UE_LOG(LogTemp, Display, TEXT("connected")); 
+    Socket->OnConnected().AddLambda([]() -> void
+                                    {
+                                        // This code will run once connected.
+                                        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Successfully!!! connected");
+                                        UE_LOG(LogTemp, Display, TEXT("connected"));
+                                    });
 
-    });
-        
-    Socket->OnConnectionError().AddLambda([](const FString & Error) -> void {
+    Socket->OnConnectionError().AddLambda([](const FString &Error) -> void
+                                          {
         // This code will run if the connection failed. Check Error to see what happened.
-        UE_LOG(LogTemp, Display, TEXT("Something bad happened while trying to connect"));
-    });
-        
-    Socket->OnClosed().AddLambda([](int32 StatusCode, const FString& Reason, bool bWasClean) -> void {
+        UE_LOG(LogTemp, Display, TEXT("Something bad happened while trying to connect")); });
+
+    Socket->OnClosed().AddLambda([](int32 StatusCode, const FString &Reason, bool bWasClean) -> void
+                                 {
         // This code will run when the connection to the server has been terminated.
         // Because of an error or a call to Socket->Close().
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Connection closed");
-        UE_LOG(LogTemp, Display, TEXT("Connection closed"));
-    });
-        
-    Socket->OnMessage().AddLambda([&](const FString & Message) -> void {
+        UE_LOG(LogTemp, Display, TEXT("Connection closed")); });
+
+    Socket->OnMessage().AddLambda([&](const FString &Message) -> void
+                                  {
 
         // This code will run when we receive a string message from the server.
         UE_LOG(LogTemp, Display, TEXT("Message received: %s"), *FString(Message));
@@ -78,25 +78,25 @@ void GamaClient::connect() const
             if (MyJson->GetField<EJson::String>(FString("type")) -> Type != EJson::Null) {
                  message_handler->HandleCommand(MyJson);
             }
-        }
-    });
-        
-    Socket->OnRawMessage().AddLambda([](const void* Data, SIZE_T Size, SIZE_T BytesRemaining) -> void {
-        // This code will run when we receive a raw (binary) message from the server.
-    });
-        
-    Socket->OnMessageSent().AddLambda([](const FString& MessageString) -> void {
+        } });
+
+    Socket->OnRawMessage().AddLambda([](const void *Data, SIZE_T Size, SIZE_T BytesRemaining) -> void
+                                     {
+                                         // This code will run when we receive a raw (binary) message from the server.
+                                     });
+
+    Socket->OnMessageSent().AddLambda([](const FString &MessageString) -> void
+                                      {
         // This code is called after we sent a message to the server.
-        UE_LOG(LogTemp, Display, TEXT("sent: %s"), *FString(MessageString));
-    });
-        
-    // And we finally connect to the server. 
+        UE_LOG(LogTemp, Display, TEXT("sent: %s"), *FString(MessageString)); });
+
+    // And we finally connect to the server.
     Socket->Connect();
 }
 
 void GamaClient::exit() const
 {
-    if(!Socket -> IsConnected())
+    if (!Socket->IsConnected())
     {
         return;
     }
@@ -106,10 +106,10 @@ void GamaClient::exit() const
         \"type\": \"exit\"\
     }\n");
 
-    Socket -> Send(exit_command);
+    Socket->Send(exit_command);
 }
 
-void GamaClient::load(int64 socket_id, FString file_path, FString experiment_name, bool console, bool status, bool dialog, TArray<ExpParameter*> parameters, FString end_condition) const
+void GamaClient::load(int64 socket_id, FString file_path, FString experiment_name, bool console, bool status, bool dialog, TArray<ExpParameter *> parameters, FString end_condition) const
 {
     if (!Socket->IsConnected())
     {
@@ -119,11 +119,12 @@ void GamaClient::load(int64 socket_id, FString file_path, FString experiment_nam
     }
 
     FString params = FString("[");
-    
-    for(int i = 0; i < parameters.Num(); i++)
+
+    for (int i = 0; i < parameters.Num(); i++)
     {
-        params += parameters[i] -> Convert();
-        if (i != parameters.Num() - 1) {
+        params += parameters[i]->Convert();
+        if (i != parameters.Num() - 1)
+        {
             params += FString(", ");
         }
     }
@@ -133,23 +134,32 @@ void GamaClient::load(int64 socket_id, FString file_path, FString experiment_nam
     FString load_command = FString("\
     {\
         \"type\": \"load\",\
-        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) + FString("\",\
-        \"model\": \"") + file_path + FString("\",\
-        \"experiment\": \"") + experiment_name + FString("\",\
-        \"console\": ") + (console ? "true" : "false") + FString(",\
-        \"status\": ") + (status ? "true" : "false") + FString(",\
-        \"dialog\": ") + (dialog ? "true" : "false") + FString(",\
-        \"runtime\": ") + "false" + FString(",\
-        \"parameters\": ") + params + FString(",\
-        \"until\": \"") + end_condition + FString("\"\
-    }\n") ;
+        \"socket_id\": \"") +
+                           FString(std::to_string(socket_id).c_str()) + FString("\",\
+        \"model\": \"") + file_path +
+                           FString("\",\
+        \"experiment\": \"") +
+                           experiment_name + FString("\",\
+        \"console\": ") + (console ? "true" : "false") +
+                           FString(",\
+        \"status\": ") + (status ? "true" : "false") +
+                           FString(",\
+        \"dialog\": ") + (dialog ? "true" : "false") +
+                           FString(",\
+        \"runtime\": ") + "false" +
+                           FString(",\
+        \"parameters\": ") +
+                           params + FString(",\
+        \"until\": \"") + end_condition +
+                           FString("\"\
+    }\n");
 
-    Socket -> Send(load_command);
+    Socket->Send(load_command);
 }
 
 void GamaClient::play(int64 socket_id, int32 exp_id, bool sync) const
 {
-    if(!Socket -> IsConnected())
+    if (!Socket->IsConnected())
     {
         return;
     }
@@ -157,18 +167,20 @@ void GamaClient::play(int64 socket_id, int32 exp_id, bool sync) const
     FString play_command = FString("\
     {\
         \"type\": \"play\",\
-        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) + FString("\",\
-        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +FString("\",\
-        \"sync\": ") + (sync ? "true" : "false") + FString("\
+        \"socket_id\": \"") +
+                           FString(std::to_string(socket_id).c_str()) + FString("\",\
+        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
+                           FString("\",\
+        \"sync\": ") + (sync ? "true" : "false") +
+                           FString("\
     }");
 
-    Socket -> Send(play_command);
+    Socket->Send(play_command);
 }
-
 
 void GamaClient::pause(int64 socket_id, int32 exp_id) const
 {
-    if(!Socket -> IsConnected())
+    if (!Socket->IsConnected())
     {
         return;
     }
@@ -176,16 +188,18 @@ void GamaClient::pause(int64 socket_id, int32 exp_id) const
     FString pause_command = FString("\
     {\
         \"type\": \"pause\",\
-        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) + FString("\",\
-        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) + FString("\"\
+        \"socket_id\": \"") +
+                            FString(std::to_string(socket_id).c_str()) + FString("\",\
+        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
+                            FString("\"\
     }");
 
-    Socket -> Send(pause_command);
+    Socket->Send(pause_command);
 }
 
 void GamaClient::step(int64 socket_id, int32 exp_id, int32 steps, bool sync) const
 {
-    if(!Socket -> IsConnected())
+    if (!Socket->IsConnected())
     {
         return;
     }
@@ -193,18 +207,22 @@ void GamaClient::step(int64 socket_id, int32 exp_id, int32 steps, bool sync) con
     FString step_command = FString("\
     {\
         \"type\": \"step\",\
-        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) + FString("\",\
-        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) + FString("\",\
-        \"nb_step\": ") + FString(std::to_string(steps).c_str()) + FString(",\
-        \"sync\": ") + (sync ? "true" : "false") + FString("\
+        \"socket_id\": \"") +
+                           FString(std::to_string(socket_id).c_str()) + FString("\",\
+        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
+                           FString("\",\
+        \"nb_step\": ") + FString(std::to_string(steps).c_str()) +
+                           FString(",\
+        \"sync\": ") + (sync ? "true" : "false") +
+                           FString("\
     }");
 
-    Socket -> Send(step_command);
+    Socket->Send(step_command);
 }
 
 void GamaClient::stepBack(int64 socket_id, int32 exp_id, int32 steps, bool sync) const
 {
-    if(!Socket -> IsConnected())
+    if (!Socket->IsConnected())
     {
         return;
     }
@@ -212,18 +230,22 @@ void GamaClient::stepBack(int64 socket_id, int32 exp_id, int32 steps, bool sync)
     FString step_command = FString("\
     {\
         \"type\": \"stepBack\",\
-        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) + FString("\",\
-        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) + FString("\",\
-        \"nb_step\": ") + FString(std::to_string(steps).c_str()) + FString(",\
-        \"sync\": ") + (sync ? "true" : "false") + FString("\
+        \"socket_id\": \"") +
+                           FString(std::to_string(socket_id).c_str()) + FString("\",\
+        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
+                           FString("\",\
+        \"nb_step\": ") + FString(std::to_string(steps).c_str()) +
+                           FString(",\
+        \"sync\": ") + (sync ? "true" : "false") +
+                           FString("\
     }");
 
-    Socket -> Send(step_command);
+    Socket->Send(step_command);
 }
 
 void GamaClient::stop(int64 socket_id, int32 exp_id) const
 {
-    if(!Socket -> IsConnected())
+    if (!Socket->IsConnected())
     {
         return;
     }
@@ -231,25 +253,27 @@ void GamaClient::stop(int64 socket_id, int32 exp_id) const
     FString stop_command = FString("\
     {\
         \"type\": \"stop\",\
-        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) + FString("\",\
-        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) + FString("\"\
+        \"socket_id\": \"") +
+                           FString(std::to_string(socket_id).c_str()) + FString("\",\
+        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
+                           FString("\"\
     }");
 
-    Socket -> Send(stop_command);
+    Socket->Send(stop_command);
 }
 
-void GamaClient::reload(int64 socket_id, int32 exp_id, TArray<ExpParameter*> parameters, FString end_condition) const
+void GamaClient::reload(int64 socket_id, int32 exp_id, TArray<ExpParameter *> parameters, FString end_condition) const
 {
-    if(!Socket -> IsConnected())
+    if (!Socket->IsConnected())
     {
         return;
     }
 
     FString params = FString("[");
-    
-    for(int i = 0; i < parameters.Num(); i++)
+
+    for (int i = 0; i < parameters.Num(); i++)
     {
-        params += parameters[i] -> Convert();
+        params += parameters[i]->Convert();
     }
 
     params += FString("]");
@@ -257,18 +281,22 @@ void GamaClient::reload(int64 socket_id, int32 exp_id, TArray<ExpParameter*> par
     FString reload_command = FString("\
     {\
         \"type\": \"reload\",\
-        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) + FString("\",\
-        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) + FString("\",\
-        \"params\": ") + params + FString(",\
-        \"until\": \"") + end_condition + FString("\"\
+        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) +
+                             FString("\",\
+        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
+                             FString("\",\
+        \"params\": ") + params +
+                             FString(",\
+        \"until\": \"") + end_condition +
+                             FString("\"\
     }");
 
-    Socket -> Send(reload_command);
+    Socket->Send(reload_command);
 }
 
 void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, FString act_name) const
 {
-    if(!Socket -> IsConnected())
+    if (!Socket->IsConnected())
     {
         return;
     }
@@ -276,15 +304,17 @@ void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, FString
     FString expression_command = FString("\
     {\
         \"type\": \"expression\",\
-        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) + FString("\",\
-        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) + FString("\",\
+        \"socket_id\": \"") + FString(std::to_string(socket_id).c_str()) +
+                                 FString("\",\
+        \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
+                                 FString("\",\
         \"expr\": \"") + expr + FString("\",\
     }");
 
-    Socket -> Send(expression_command);
-    
+    Socket->Send(expression_command);
+
     // Socket->OnMessage().Clear();
-    // Socket->OnMessage().AddLambda([&](const FString & Message) -> void { 
+    // Socket->OnMessage().AddLambda([&](const FString & Message) -> void {
     //     // This code will run when we receive a string message from the server.
     //     UE_LOG(LogTemp, Display, TEXT("Message received: %s"), *FString(Message));
 
@@ -296,14 +326,13 @@ void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, FString
     //     {
     //         // The deserialization failed, handle this case
     //         // UE_LOG(LogTemp, Display, TEXT("Unable to deserialize"))
-    //         if (MyJson->GetField<EJson::String>(FString("type")) -> Type != EJson::Null) { 
+    //         if (MyJson->GetField<EJson::String>(FString("type")) -> Type != EJson::Null) {
     //             // message_handler -> HandleCommand(act_name, MyJson);
-                
+
     //     // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "2connected");
     //         }
     //     }
     // });
-        
 }
 
 void GamaClient::HandleCommand(TSharedPtr<FJsonObject> MyJson)
@@ -320,7 +349,7 @@ void GamaClient::HandleCommand(TSharedPtr<FJsonObject> MyJson)
         }
         else if (type == "CommandExecutedSuccessfully")
         {
-            HandleCommandExecutedSuccessfully( MyJson);
+            HandleCommandExecutedSuccessfully(MyJson);
         }
     }
 }
@@ -330,6 +359,10 @@ int32 GamaClient::GetExpId() const
     return _exp_id;
 }
 
+void GamaClient::SetExpId(int64 ee)
+{
+    _exp_id = ee;
+}
 int64 GamaClient::GetSocketId() const
 {
     return _socket_id;
@@ -337,28 +370,28 @@ int64 GamaClient::GetSocketId() const
 
 void GamaClient::SetSocketId(int64 ss)
 {
-    _socket_id=ss;
+    _socket_id = ss;
 }
 
 void GamaClient::HandleConnectionSuccessful(TSharedPtr<FJsonObject> MyJson)
 {
-	int64 _socket_id1;
-    if (MyJson->TryGetNumberField("content",  _socket_id1))
+    int64 _socket_id1;
+    if (MyJson->TryGetNumberField("content", _socket_id1))
     {
         _socket_id1 = MyJson->GetIntegerField("content");
         message_handler->SetSocketId(_socket_id1);
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(std::to_string(_socket_id1).c_str()));
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(std::to_string(_socket_id1).c_str()));
     }
 }
 
-void GamaClient::HandleCommandExecutedSuccessfully(  TSharedPtr<FJsonObject> MyJson)
+void GamaClient::HandleCommandExecutedSuccessfully(TSharedPtr<FJsonObject> MyJson)
 {
     // const TSharedPtr<FJsonObject>* Content;
     int OutNumber;
-
+ 
     if (MyJson->TryGetNumberField("content", OutNumber))
-    {
-        _exp_id = OutNumber;
+    { 
+        message_handler->SetExpId(OutNumber);
     }
     // const TSharedPtr<FJsonObject> *bbb;
     FString ttt;

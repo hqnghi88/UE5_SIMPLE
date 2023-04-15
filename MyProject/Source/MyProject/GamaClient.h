@@ -27,6 +27,7 @@ public:
 
 	// Get simulation parameters
 	int32 GetExpId() const;
+	void SetExpId(int64 ee);
 	int64 GetSocketId() const;
 	void SetSocketId(int64 ss);
 	// Handle commands returned by Json messages
