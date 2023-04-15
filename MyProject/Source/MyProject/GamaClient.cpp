@@ -399,7 +399,7 @@ void GamaClient::HandleCommandExecutedSuccessfully(TSharedPtr<FJsonObject> MyJso
     // const TSharedPtr<FJsonObject>* Content;
     int OutNumber;
 
-    if (MyJson->TryGetNumberField("content", OutNumber))
+    if (message_handler->GetExpId()==0 && MyJson->TryGetNumberField("content", OutNumber))
     {
         message_handler->SetExpId(OutNumber);
     }
@@ -426,17 +426,17 @@ void GamaClient::HandleCommandExecutedSuccessfully(TSharedPtr<FJsonObject> MyJso
             }
         }
         // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, CommandName);
-        // if ((*Command)->TryGetStringField("type", CommandName) && CommandName.Equals("expression"))
-        // {
+        if ((*Command)->TryGetStringField("type", CommandName) && CommandName.Equals("expression"))
+        {
         //     const TSharedPtr<FJsonObject> *BuildingInfo;
 
         //     if (MyJson->TryGetObjectField("content", BuildingInfo))
         //     {
-        //         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "sssss");
+                GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "sssss");
         //         // FString ttt;
         //         // (*BuildingInfo)->TryGetStringField("type", ttt);
         //     }
-        // }
+        }
     }
 }
 GamaClient::~GamaClient()

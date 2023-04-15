@@ -22,7 +22,7 @@ void AGamaActionsBBox::BeginPlay()
 {
 	Super::BeginPlay(); 
 
-	// SetActorTickInterval(2); 
+	SetActorTickInterval(2); 
 	// // Spawn an instance of ObjectHandlerr in the map in a place far from the objects
 	// UWorld* CurrentWorld = GetWorld();
 	// const FVector* Loc = new FVector(-1000, -1000, -1000);
@@ -52,24 +52,11 @@ void AGamaActionsBBox::Tick(float DeltaTime)
 
 	if (GI && GI->client->message_handler->playing)
 	{
-
-		// read the model
-		// if (first && GI->message_handler->GetSocketId() > 0)
-		// {
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "retrieve");
-		// 	FString current_path = FPaths::ProjectDir();
-		// 	FString url = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*(current_path + "../MobilityModel/models/Grid Model.gaml"));
-		// 	FString model = "grid_model";
-		// 	GI->client->load(GI->message_handler->GetSocketId(), url, model);
-		// 	first = false;
-		// }
-
-		// // play command
-		// if (!played && GI->message_handler->GetExpId() > 0)
-		// {
-		// 	GI->client->play(GI->message_handler->GetSocketId(), GI->message_handler->GetExpId(), true);
-		// 	played = true;
-		// }
+ 
+			  
+		GI->client->expression(GI->client->message_handler->GetSocketId(), GI->client->message_handler->GetExpId(), "to_geojson(BBox,'EPSG:4326',['color'])", "gogo");//);
+	  
+		 
 	} 
 }
 
