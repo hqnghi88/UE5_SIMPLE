@@ -70,6 +70,7 @@
         "xloctime": "cpp",
         "xstddef": "cpp",
         "xtree": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "iostream": "cpp"
     }
 }

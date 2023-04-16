@@ -22,11 +22,7 @@ void AGamaActionsBBox::BeginPlay()
 {
 	Super::BeginPlay(); 
 
-	SetActorTickInterval(2); 
-	// // Spawn an instance of ObjectHandlerr in the map in a place far from the objects
-	// UWorld* CurrentWorld = GetWorld();
-	// const FVector* Loc = new FVector(-1000, -1000, -1000);
-	// ObjHandler = (AObjectHandler*)CurrentWorld->SpawnActor(AObjectHandler::StaticClass(), Loc);
+	SetActorTickInterval(1); 
 }
 
 void AGamaActionsBBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -54,7 +50,7 @@ void AGamaActionsBBox::Tick(float DeltaTime)
 	{
  
 			  
-		GI->client->expression(GI->client->message_handler->GetSocketId(), GI->client->message_handler->GetExpId(), "to_geojson(BBox,'EPSG:4326',['color'])", "gogo");//);
+		GI->client->expression(GI->client->message_handler->GetSocketId(), GI->client->message_handler->GetExpId(), "to_geojson(BBox,'EPSG:4326',['location'])", true);//);
 	  
 		 
 	} 

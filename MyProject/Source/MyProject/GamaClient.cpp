@@ -6,6 +6,7 @@
 #include "IWebSocket.h"
 #include "Serialization/JsonSerializer.h"
 #include "Containers/Array.h"
+#include "ObjectHandler.h"
 #include "Engine/World.h"
 #include "ExpParameter.h"
 #include <string>
@@ -17,14 +18,14 @@ GamaClient::GamaClient()
     this->message_handler = this;
 }
 
-GamaClient::GamaClient(FString url, int32 port)
+GamaClient::GamaClient(FString url, int32 port, AObjectHandler *objHdlr)
 {
     _exp_id = 0;
     _socket_id = 0;
-
     const FString ServerURL = FString("ws://") + url + FString(":") + FString(std::to_string(port).c_str()); // Your server URL. You can use ws, wss or wss+insecure.
     const FString ServerProtocol = FString("ws");                                                            // The WebServer protocol you want to use
     Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
+    ObjHandler=objHdlr;
     this->message_handler = new GamaClient();
 }
 
@@ -304,7 +305,7 @@ void GamaClient::reload(int64 socket_id, int32 exp_id, TArray<ExpParameter *> pa
     Socket->Send(reload_command);
 }
 
-void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, FString act_name) const
+void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, bool esc) const
 {
     if (!message_handler->connected) //! Socket->IsConnected())
     {
@@ -319,6 +320,7 @@ void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, FString
         \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
                                  FString("\",\
         \"expr\": \"") + expr + FString("\",\
+        \"escaped\": \"") + (esc ? "true" : "false") + FString("\",\
     }");
 
     Socket->Send(expression_command);
@@ -399,7 +401,7 @@ void GamaClient::HandleCommandExecutedSuccessfully(TSharedPtr<FJsonObject> MyJso
     // const TSharedPtr<FJsonObject>* Content;
     int OutNumber;
 
-    if (message_handler->GetExpId()==0 && MyJson->TryGetNumberField("content", OutNumber))
+    if (message_handler->GetExpId() == 0 && MyJson->TryGetNumberField("content", OutNumber))
     {
         message_handler->SetExpId(OutNumber);
     }
@@ -428,14 +430,16 @@ void GamaClient::HandleCommandExecutedSuccessfully(TSharedPtr<FJsonObject> MyJso
         // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, CommandName);
         if ((*Command)->TryGetStringField("type", CommandName) && CommandName.Equals("expression"))
         {
-        //     const TSharedPtr<FJsonObject> *BuildingInfo;
+            //     const TSharedPtr<FJsonObject> *BuildingInfo;
 
-        //     if (MyJson->TryGetObjectField("content", BuildingInfo))
-        //     {
+            //     if (MyJson->TryGetObjectField("content", BuildingInfo))
+            //     {
+                
                 GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "sssss");
-        //         // FString ttt;
-        //         // (*BuildingInfo)->TryGetStringField("type", ttt);
-        //     }
+            ObjHandler->HandleObject(MyJson);
+            //         // FString ttt;
+            //         // (*BuildingInfo)->TryGetStringField("type", ttt);
+            //     }
         }
     }
 }

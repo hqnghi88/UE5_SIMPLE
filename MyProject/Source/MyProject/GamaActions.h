@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GamaClient.h"
-#include "ObjectHandler.h"
 #include "GamaActions.generated.h"
 
 UCLASS(BlueprintType)
@@ -25,8 +24,7 @@ class MYPROJECT_API AGamaActions : public AActor
 	// TCP handling
 	FSocket* TcpSocket;
 	//ObjectHandler* ObjHandler;
-	AObjectHandler* ObjHandler;
-	
+
 	// Game logic
 	bool first = true;
 	bool last = true;

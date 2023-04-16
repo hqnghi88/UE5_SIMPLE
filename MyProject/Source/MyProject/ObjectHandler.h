@@ -39,12 +39,13 @@ private:
 	//int32 y_offset;
 
 	UStaticMeshComponent* StaticMesh;
-	GamaMap* map;
 
 public:	
 	// Sets default values for this actor's properties
 	AObjectHandler();
 
+	GamaMap* map;
+	UWorld *CurrentWorld;
 	//bool id_found(int32 ID, TArray<int32> ids);
 
 	//TArray<int32> GetHouseIds();
@@ -58,9 +59,9 @@ public:
 	//TArray<APeople*> GetPeoples();
 
 	// Handle changes in the model
-	void HandleObject(TSharedPtr<FJsonObject> MyJson, UWorld* CurrentWorld);
-	void HandleBuilding(const TArray<TSharedPtr<FJsonValue>>*& Info, UWorld* CurrentWorld);
-	void HandlePeople(const TArray<TSharedPtr<FJsonValue>>*& Info, UWorld* CurrentWorld);
+	void HandleObject(TSharedPtr<FJsonObject> MyJson);
+	void HandleBuilding(const TArray<TSharedPtr<FJsonValue>>*& Info);
+	void HandlePeople(const TArray<TSharedPtr<FJsonValue>>*& Info);
 	//void DestroyBuilding(FString type, int32 ID, UWorld* CurrentWorld);
 
 	//// Remove building IDs and buildings out of arrays

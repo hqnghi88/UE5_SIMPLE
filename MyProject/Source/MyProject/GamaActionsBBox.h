@@ -20,6 +20,7 @@ class MYPROJECT_API AGamaActionsBBox : public AActor
 	const uint16 TCP_PORT		= 8000;
  
 	
+	
 	// Game logic
 	bool first = true;
 	bool last = true;

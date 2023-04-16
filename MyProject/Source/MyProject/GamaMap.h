@@ -38,8 +38,8 @@ public:
 
 	void Init(UWorld* CurrentWorld);
 
-	void InitOrUpdatePeople(int id, int x, int y, int heading, UWorld* CurrentWorld);
-	void RemovePeople(int id);
+	void InitOrUpdatePeople(int id, double x, double y, double heading, UWorld* CurrentWorld);
+	void RemovePeople();
 	void SetBuildingVisible(ABuilding::BuildingTypes t, int id) const;
 
 	void ToggleBuilding(ABuilding::BuildingTypes t, int id) const;

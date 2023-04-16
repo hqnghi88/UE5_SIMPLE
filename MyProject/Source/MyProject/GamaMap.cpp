@@ -2,70 +2,75 @@
 
 
 #include "GamaMap.h"
+#include <string>
 
 GamaMap::GamaMap()
-{
+{ 
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "map");
 }
 
 void GamaMap::Init(UWorld* CurrentWorld)
 {
-	for (int x = 0; x < 8; x++) {
-		for (int y = 0; y < 8; y++) {
+	// for (int x = 0; x < 8; x++) {
+	// 	for (int y = 0; y < 8; y++) {
 
-			const FVector* Loc = new FVector(x * scaling_factor + x_offset, y * scaling_factor + y_offset, 0);
+	// 		const FVector* Loc = new FVector(x * scaling_factor + x_offset, y * scaling_factor + y_offset, 0);
 			
-			AHouse* house = (AHouse*)CurrentWorld->SpawnActor(AHouse::StaticClass(), Loc);
-			if (house != nullptr) {
-				house->SetActorHiddenInGame(true);
-				house->SetActorEnableCollision(false);
-				house->SetID(Houses.Num());
-				Houses.Add(house);
-			}
+	// 		AHouse* house = (AHouse*)CurrentWorld->SpawnActor(AHouse::StaticClass(), Loc);
+	// 		if (house != nullptr) {
+	// 			house->SetActorHiddenInGame(true);
+	// 			house->SetActorEnableCollision(false);
+	// 			house->SetID(Houses.Num());
+	// 			Houses.Add(house);
+	// 		}
 
-			AEmptyBuilding* empty = (AEmptyBuilding*)CurrentWorld->SpawnActor(AEmptyBuilding::StaticClass(), Loc);
-			if (empty != nullptr) {
-				empty->SetActorHiddenInGame(true);
-				empty->SetActorEnableCollision(false);
-				empty->SetID(EmptyBuildings.Num());
-				EmptyBuildings.Add(empty);
-			}
+	// 		AEmptyBuilding* empty = (AEmptyBuilding*)CurrentWorld->SpawnActor(AEmptyBuilding::StaticClass(), Loc);
+	// 		if (empty != nullptr) {
+	// 			empty->SetActorHiddenInGame(true);
+	// 			empty->SetActorEnableCollision(false);
+	// 			empty->SetID(EmptyBuildings.Num());
+	// 			EmptyBuildings.Add(empty);
+	// 		}
 
-			AOffice* office = (AOffice*)CurrentWorld->SpawnActor(AOffice::StaticClass(), Loc);
-			if (office != nullptr) {
-				office->SetActorHiddenInGame(true);
-				office->SetActorEnableCollision(false);
-				office->SetID(Offices.Num());
-				Offices.Add(office);
-			}
-		}
-	}
+	// 		AOffice* office = (AOffice*)CurrentWorld->SpawnActor(AOffice::StaticClass(), Loc);
+	// 		if (office != nullptr) {
+	// 			office->SetActorHiddenInGame(true);
+	// 			office->SetActorEnableCollision(false);
+	// 			office->SetID(Offices.Num());
+	// 			Offices.Add(office);
+	// 		}
+	// 	}
+	// }
 
 }
 
-void GamaMap::InitOrUpdatePeople(int id, int x, int y, int heading, UWorld* CurrentWorld)
+void GamaMap::InitOrUpdatePeople(int id, double x, double y, double heading, UWorld* CurrentWorld)
 {
-	int new_x = x_offset + scaling_factor * x;
-	int new_y = y_offset + scaling_factor * y;
+	// int new_x = x_offset + scaling_factor * x;
+	// int new_y = y_offset + scaling_factor * y;
 	
-	if (People.Contains(id)) {
-		People[id]->SetPosition(new_x, new_y, heading);
-	}
-	else {
+	// if (People.Contains(id)) {
+	// 	People[id]->SetPosition(new_x, new_y, heading);
+	// }
+	// else {
 
-		const FVector* loc = new FVector(new_x, new_y, 0);
-		APeople* people = (APeople*)CurrentWorld->SpawnActor(APeople::StaticClass(), loc,new FRotator(0,heading,0));
-		if (people != nullptr)
-		{
-			people->Init(id, new_x, new_y, heading);
-			People.Add(id, people);
-		}
-	}
+	// 	const FVector* loc = new FVector(new_x, new_y, 0);
+	// 	APeople* people = (APeople*)CurrentWorld->SpawnActor(APeople::StaticClass(), loc,new FRotator(0,heading,0));
+	// 	if (people != nullptr)
+	// 	{
+	// 		people->Init(id, new_x, new_y, heading);
+	// 		People.Add(id, people);
+	// 	}
+	// }
 
 }
 
-void GamaMap::RemovePeople(int id)
+void GamaMap::RemovePeople( )
 {
-	People.Remove(id);
+            // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(std::to_string(id).c_str())); 
+			
+	GLog->Log(FString(std::to_string(4).c_str()));
+	// People.Remove(id);
 }
 
 void GamaMap::SetBuildingVisible(ABuilding::BuildingTypes t, int id) const

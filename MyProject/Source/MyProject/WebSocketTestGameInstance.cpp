@@ -24,7 +24,12 @@ void UWebSocketTestGameInstance::Init()
         FModuleManager::Get().LoadModule("Json");
     }
  
-	client = new GamaClient(GAMA_URL, GAMA_SERVER_PORT);
+	// Spawn an instance of ObjectHandlerr in the map in a place far from the objects
+	UWorld* CurrentWorld = GetWorld();
+	const FVector* Loc = new FVector(-1000, -1000, -1000);
+	ObjHandler = (AObjectHandler*)CurrentWorld->SpawnActor(AObjectHandler::StaticClass(), Loc);
+	ObjHandler->CurrentWorld=CurrentWorld;
+	client = new GamaClient(GAMA_URL, GAMA_SERVER_PORT,ObjHandler);
 	client -> connect();
 	// //ObjHandler = new ObjectHandler();
 

@@ -11,6 +11,12 @@
 #include "Containers/Array.h"
 #include "Engine/World.h"
 #include "GamaActions.h"
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <sstream>
+#include <iterator>
+#include <vector>
 
 // Sets default values
 AObjectHandler::AObjectHandler()
@@ -77,23 +83,73 @@ AObjectHandler::AObjectHandler()
 //	return peoples;
 // }
 
-void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson, UWorld *CurrentWorld)
+void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson)
 {
-	const TArray<TSharedPtr<FJsonValue>> *BuildingInfo;
-	const TArray<TSharedPtr<FJsonValue>> *PeopleInfo;
+	// Create a json object to store the information from the json string
+	// The json reader is used to deserialize the json object later on
+	TSharedPtr<FJsonObject> JsonObject = MyJson; // MakeShareable(new FJsonObject());
+	// The person "object" that is retrieved from the given json file
+	TSharedPtr<FJsonObject> PersonObject = JsonObject->GetObjectField("content");
+ 
+	GLog->Log("Type:" + PersonObject->GetStringField("type"));
+	// GLog->Log("Age:" + FString::FromInt(PersonObject->GetIntegerField("age")));
+	// FString IsActiveStr = (PersonObject->GetBoolField("isActive")) ? "Active" : "Inactive";
+	// GLog->Log("IsActive:" + IsActiveStr);
+	// GLog->Log("Latitude:" + FString::SanitizeFloat(PersonObject->GetNumberField("latitude")));
 
-	if (MyJson->TryGetArrayField("building", BuildingInfo))
+	// Retrieving an array property and printing each field
+	TArray<TSharedPtr<FJsonValue>> objArray = PersonObject->GetArrayField("features");
+	GLog->Log("printing family names...");
+	for (int32 index = 0; index < objArray.Num(); index++)
 	{
-		HandleBuilding(BuildingInfo, CurrentWorld);
+		// GLog->Log( objArray[index]->AsObject()->GetStringField("type")   );
+
+		GLog->Log(objArray[index]->AsObject()->GetStringField("id"));
+		GLog->Log(objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location"));
+		FString test = objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location");
+		std::string exampleString = std::string(TCHAR_TO_UTF8(*test));
+
+		exampleString.front() = exampleString.back() = ' ';
+		std::replace(exampleString.begin(), exampleString.end(), ',', ' ');
+
+		// Create stringstream from string.
+		auto iss = std::istringstream(exampleString);
+
+		// Create vector of doubles from stringstream.
+		const auto doublesVector = std::vector<double>(std::istream_iterator<double>(iss),
+													   std::istream_iterator<double>());
+		// FVector fv=new FVector(doublesVector[0],doublesVector[1],doublesVector[2]);
+		GLog->Log(FString(std::to_string(doublesVector[0]).c_str()));
+		// for (const auto d : doublesVector)
+		// {
+		// }
+		if (map)
+		{
+
+			map->RemovePeople();
+		}
+		else
+		{
+			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "error map");
+		}
+		// map->InitOrUpdatePeople(objArray[index]->AsObject()->GetNumberField("id"), doublesVector[0], doublesVector[1], doublesVector[0], GetWorld());
 	}
 
-	if (MyJson->TryGetArrayField("people", PeopleInfo))
-	{
-		HandlePeople(PeopleInfo, CurrentWorld);
-	}
+	// 	const TArray<TSharedPtr<FJsonValue>> *BuildingInfo;
+	// 	const TArray<TSharedPtr<FJsonValue>> *PeopleInfo;
+
+	// 	if (MyJson->TryGetArrayField("building", BuildingInfo))
+	// 	{
+	// 		HandleBuilding(BuildingInfo);
+	// 	}
+
+	// 	if (MyJson->TryGetArrayField("people", PeopleInfo))
+	// 	{
+	// 		HandlePeople(PeopleInfo);
+	// 	}
 }
 
-void AObjectHandler::HandleBuilding(const TArray<TSharedPtr<FJsonValue>> *&Info, UWorld *CurrentWorld)
+void AObjectHandler::HandleBuilding(const TArray<TSharedPtr<FJsonValue>> *&Info)
 {
 	// we update the visibility of buildings
 	for (int32 i = 0; i < Info->Num(); i++)
@@ -101,125 +157,9 @@ void AObjectHandler::HandleBuilding(const TArray<TSharedPtr<FJsonValue>> *&Info,
 		int type = (*Info)[i]->AsNumber();
 		map->SetBuildingVisible((ABuilding::BuildingTypes)type, i);
 	}
-
-	//// destroy old house
-	// auto tmp_houses = houses;
-	// for (int32 i = 0; i < tmp_houses.Num(); i++)
-	//{
-	//	bool present = false;
-	//	for (int32 j = 0; j < Info->Num(); j++)
-	//	{
-	//		TSharedPtr<FJsonObject> obj = (*Info)[j]->AsObject();
-	//		FString type = obj->GetStringField("type");
-	//		int32 ID = obj->GetIntegerField("id");
-	//		if (type == "house" && ID == tmp_houses[i]->GetID())
-	//		{
-	//			present = true;
-	//			break;
-	//		}
-	//	}
-	//	if (!present)
-	//	{
-	//		DestroyBuilding("house", tmp_houses[i]->GetID(), CurrentWorld);
-	//	}
-	// }
-
-	////destroy old empty building
-	// auto tmp_empty_buildings = empty_buildings;
-	// for (int32 i = 0; i < tmp_empty_buildings.Num(); i++)
-	//{
-	//	bool present = false;
-	//	for (int32 j = 0; j < Info->Num(); j++)
-	//	{
-	//		TSharedPtr<FJsonObject> obj = (*Info)[j]->AsObject();
-	//		FString type = obj->GetStringField("type");
-	//		int32 ID = obj->GetIntegerField("id");
-	//		if (type == "empty" && ID == tmp_empty_buildings[i]->GetID())
-	//		{
-	//			present = true;
-	//			break;
-	//		}
-	//	}
-	//	if (!present)
-	//	{
-	//		DestroyBuilding("empty", tmp_empty_buildings[i]->GetID(), CurrentWorld);
-	//	}
-	// }
-
-	////destroy old offices
-	// auto tmp_offices = offices;
-	// for (int32 i = 0; i < tmp_offices.Num(); i++)
-	//{
-	//	bool present = false;
-	//	for (int32 j = 0; j < Info->Num(); j++)
-	//	{
-	//		TSharedPtr<FJsonObject> obj = (*Info)[j]->AsObject();
-	//		FString type = obj->GetStringField("type");
-	//		int32 ID = obj->GetIntegerField("id");
-	//		if (type == "office" && ID == tmp_offices[i]->GetID())
-	//		{
-	//			present = true;
-	//			break;
-	//		}
-	//	}
-	//	if (!present)
-	//	{
-	//		DestroyBuilding("office", tmp_offices[i]->GetID(), CurrentWorld);
-	//	}
-	// }
-
-	//// add new buildings
-	// for (int32 i = 0; i < Info->Num(); i++)
-	//{
-	//	TSharedPtr<FJsonObject> obj = (*Info)[i]->AsObject();
-	//	if (obj != NULL)
-	//	{
-	//		int32 ID = obj->GetIntegerField("id");
-
-	//		FString type = obj->GetStringField("type");
-	//		const TSharedPtr<FJsonObject>* Location;
-	//		if (obj->TryGetObjectField("location", Location))
-	//		{
-	//			double x = x_offset + (*Location)->GetNumberField("x") * scaling_factor;
-	//			double y = y_offset + (*Location)->GetNumberField("y") * scaling_factor;
-	//			const FVector* Loc = new FVector(x, y, 0);
-
-	//			if (type == "house" && !id_found(ID, house_ids))
-	//			{
-	//				AHouse* house = (AHouse*)CurrentWorld->SpawnActor(AHouse::StaticClass(), Loc);
-	//				if (house != NULL)
-	//				{
-	//					house->SetID(ID);
-	//					houses.Add(house);
-	//					house_ids.Add(ID);
-	//				}
-	//			}
-	//			if (type == "empty" && !id_found(ID, empty_ids))
-	//			{
-	//				AEmptyBuilding* empty = (AEmptyBuilding*)CurrentWorld->SpawnActor(AEmptyBuilding::StaticClass(), Loc);
-	//				if (empty != NULL)
-	//				{
-	//					empty->SetID(ID);
-	//					empty_buildings.Add(empty);
-	//					empty_ids.Add(ID);
-	//				}
-	//			}
-	//			if (type == "office" && !id_found(ID, office_ids))
-	//			{
-	//				AOffice* office = (AOffice*)CurrentWorld->SpawnActor(AOffice::StaticClass(), Loc);
-	//				if (office != NULL)
-	//				{
-	//					office->SetID(ID);
-	//					offices.Add(office);
-	//					office_ids.Add(ID);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
 }
 
-void AObjectHandler::HandlePeople(const TArray<TSharedPtr<FJsonValue>> *&Info, UWorld *CurrentWorld)
+void AObjectHandler::HandlePeople(const TArray<TSharedPtr<FJsonValue>> *&Info)
 {
 	TSet<int> ids;
 	// Start by updating and/or creating people in the simulation
@@ -239,145 +179,10 @@ void AObjectHandler::HandlePeople(const TArray<TSharedPtr<FJsonValue>> *&Info, U
 	{
 		if (!ids.Contains(id))
 		{
-			map->RemovePeople(id);
+			// map->RemovePeople(id);
 		}
 	}
-
-	//// change people's location
-	// auto tmp_peoples = peoples;
-	// for (int32 i = 0; i < tmp_peoples.Num(); i++)
-	//{
-	//	bool present = false;
-	//	APeople* people = tmp_peoples[i];
-	//	for (int32 j = 0; j < Info->Num(); j++)
-	//	{
-	//		TSharedPtr<FJsonObject> obj = (*Info)[j]->AsObject();
-	//		int32 ID = obj->GetIntegerField("id");
-	//		if (ID == tmp_peoples[i]->GetID())
-	//		{
-	//			const TSharedPtr<FJsonObject>* Location;
-	//			if (obj->TryGetObjectField("location", Location))
-	//			{
-	//				double x = x_offset + (*Location)->GetNumberField("x") * scaling_factor;
-	//				double y = y_offset + (*Location)->GetNumberField("y") * scaling_factor;
-	//				//const FVector* Loc = new FVector(x, y, 0.0);
-	//				double heading = obj->GetNumberField("heading");
-	//				tmp_peoples[i]->SetPosition(x, y, heading);
-	//
-	//				present = true;
-	//				break;
-	//			}
-	//		}
-	//	}
-	//	if (!present)
-	//	{
-	//		DestroyPeople(tmp_peoples[i]->GetID(), CurrentWorld);
-	//	}
-	// }
-
-	//// add new people
-	// for (int32 i = 0; i < Info->Num(); i++)
-	//{
-	//	TSharedPtr<FJsonObject> obj = (*Info)[i]->AsObject();
-	//	if (obj != NULL)
-	//	{
-	//		int32 ID = obj->GetIntegerField("id");
-	//		const TSharedPtr<FJsonObject>* Location;
-	//		if (obj->TryGetObjectField("location", Location) && !id_found(ID, people_ids))
-	//		{
-	//			double x = x_offset + (*Location)->GetNumberField("x") * scaling_factor;
-	//			double y = y_offset + (*Location)->GetNumberField("y") * scaling_factor;
-	//			double heading = obj->GetNumberField("heading");
-	//			APeople* people = (APeople*)CurrentWorld->SpawnActor(APeople::StaticClass());
-	//			if (people != nullptr)
-	//			{
-	//				people->Init(ID, x, y, heading);
-	//				peoples.Add(people);
-	//				people_ids.Add(ID);
-	//			}
-	//		}
-	//	}
-	// }
 }
-
-//
-// void AObjectHandler::DestroyBuilding(FString type, int32 ID, UWorld* CurrentWorld)
-//{
-//	if (type == "house")
-//	{
-//		auto house = houses.FindByPredicate([&](AHouse* item) {return item->GetID() == ID; });
-//		if (house != NULL)
-//		{
-//			bool destroyed_house = CurrentWorld->DestroyActor(*house);
-//			if (destroyed_house)
-//			{
-//				RemoveHouse(*house);
-//			}
-//		}
-//
-//	}
-//	if (type == "empty")
-//	{
-//		auto empty = empty_buildings.FindByPredicate([&](AEmptyBuilding* item) {return item->GetID() == ID; });
-//		if (empty != NULL)
-//		{
-//			bool destroyed_empty = CurrentWorld->DestroyActor(*empty);
-//			if (destroyed_empty)
-//			{
-//				RemoveEmpty(*empty);
-//			}
-//		}
-//
-//	}
-//	if (type == "office")
-//	{
-//		auto office = offices.FindByPredicate([&](AOffice* item) {return item->GetID() == ID; });
-//		if (office != NULL)
-//		{
-//			bool destroyed_office = CurrentWorld->DestroyActor(*office);
-//			if (destroyed_office)
-//			{
-//				RemoveOffice(*office);
-//			}
-//		}
-//	}
-//}
-//
-// void AObjectHandler::RemoveHouse(AHouse* house)
-//{
-//	int32 ID = house->GetID();
-//	house_ids.Remove(ID);
-//	houses.RemoveSingle(house);
-//	//AGamaActions::SendChange("house", ID);
-//}
-//
-// void AObjectHandler::RemoveEmpty(AEmptyBuilding* empty)
-//{
-//	int32 ID = empty->GetID();
-//	empty_ids.Remove(empty->GetID());
-//	empty_buildings.RemoveSingle(empty);
-//}
-//
-// void AObjectHandler::RemoveOffice(AOffice* office)
-//{
-//	int32 ID = office->GetID();
-//	office_ids.Remove(office->GetID());
-//	offices.RemoveSingle(office);
-//}
-//
-// void AObjectHandler::DestroyPeople(int32 ID, UWorld* CurrentWorld)
-//{
-//	auto people = peoples.FindByPredicate([&](APeople* item) {return item->GetID() == ID; });
-//	if (people != NULL)
-//	{
-//		bool destroyed_people = CurrentWorld->DestroyActor(*people);
-//		if (destroyed_people)
-//		{
-//			people_ids.Remove((*people)->GetID());
-//			peoples.RemoveSingle(*people);
-//		}
-//	}
-//}
 
 AObjectHandler::~AObjectHandler()
 {
@@ -388,7 +193,7 @@ AObjectHandler::~AObjectHandler()
 void AObjectHandler::BeginPlay()
 {
 	Super::BeginPlay();
-	map->Init(GetWorld());
+	map->Init(CurrentWorld);
 }
 
 void AObjectHandler::EndPlay(const EEndPlayReason::Type reason)
