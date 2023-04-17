@@ -6,6 +6,7 @@
 #include "IWebSocket.h"
 #include "Containers/Array.h"
 #include "ObjectHandler.h"
+#include "GamaClient.h"
 #include "ExpParameter.h"
 
 class MYPROJECT_API GamaClient
@@ -24,6 +25,7 @@ public:
 
 public:
 	GamaClient();
+	GamaClient(AObjectHandler *objHdlr);
 	GamaClient(FString url, int32 port, AObjectHandler *objHdlr);
 	void connect() const;
 	bool IsConnected() const;

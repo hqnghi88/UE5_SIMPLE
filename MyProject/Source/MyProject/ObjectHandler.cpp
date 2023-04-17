@@ -10,7 +10,9 @@
 #include "Serialization/JsonSerializer.h"
 #include "Containers/Array.h"
 #include "Engine/World.h"
+#include "WebSocketTestGameInstance.h"
 #include "GamaActions.h"
+#include "GamaMap.h"
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -34,8 +36,6 @@ AObjectHandler::AObjectHandler()
 	empty_buildings = {};
 	offices = {};
 	peoples = {};*/
-
-	map = new GamaMap();
 }
 
 // bool AObjectHandler::id_found(int32 ID, TArray<int32> ids)
@@ -90,7 +90,7 @@ void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson)
 	TSharedPtr<FJsonObject> JsonObject = MyJson; // MakeShareable(new FJsonObject());
 	// The person "object" that is retrieved from the given json file
 	TSharedPtr<FJsonObject> PersonObject = JsonObject->GetObjectField("content");
- 
+
 	GLog->Log("Type:" + PersonObject->GetStringField("type"));
 	// GLog->Log("Age:" + FString::FromInt(PersonObject->GetIntegerField("age")));
 	// FString IsActiveStr = (PersonObject->GetBoolField("isActive")) ? "Active" : "Inactive";
@@ -104,8 +104,8 @@ void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson)
 	{
 		// GLog->Log( objArray[index]->AsObject()->GetStringField("type")   );
 
-		GLog->Log(objArray[index]->AsObject()->GetStringField("id"));
-		GLog->Log(objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location"));
+		// GLog->Log(objArray[index]->AsObject()->GetStringField("id"));
+		// GLog->Log(objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location"));
 		FString test = objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location");
 		std::string exampleString = std::string(TCHAR_TO_UTF8(*test));
 
@@ -119,20 +119,13 @@ void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson)
 		const auto doublesVector = std::vector<double>(std::istream_iterator<double>(iss),
 													   std::istream_iterator<double>());
 		// FVector fv=new FVector(doublesVector[0],doublesVector[1],doublesVector[2]);
-		GLog->Log(FString(std::to_string(doublesVector[0]).c_str()));
+		// GLog->Log(FString(std::to_string(doublesVector[0]).c_str()));
 		// for (const auto d : doublesVector)
 		// {
 		// }
-		if (map)
-		{
 
-			map->RemovePeople();
-		}
-		else
-		{
-			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "error map");
-		}
-		// map->InitOrUpdatePeople(objArray[index]->AsObject()->GetNumberField("id"), doublesVector[0], doublesVector[1], doublesVector[0], GetWorld());
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "error map");
+		gamamap->InitOrUpdatePeople(objArray[index]->AsObject()->GetIntegerField("id"), doublesVector[0], doublesVector[1], doublesVector[0], GetWorld());
 	}
 
 	// 	const TArray<TSharedPtr<FJsonValue>> *BuildingInfo;
@@ -152,11 +145,11 @@ void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson)
 void AObjectHandler::HandleBuilding(const TArray<TSharedPtr<FJsonValue>> *&Info)
 {
 	// we update the visibility of buildings
-	for (int32 i = 0; i < Info->Num(); i++)
-	{
-		int type = (*Info)[i]->AsNumber();
-		map->SetBuildingVisible((ABuilding::BuildingTypes)type, i);
-	}
+	// for (int32 i = 0; i < Info->Num(); i++)
+	// {
+	// 	int type = (*Info)[i]->AsNumber();
+	// 	gamamap->SetBuildingVisible((ABuilding::BuildingTypes)type, i);
+	// }
 }
 
 void AObjectHandler::HandlePeople(const TArray<TSharedPtr<FJsonValue>> *&Info)
@@ -170,30 +163,30 @@ void AObjectHandler::HandlePeople(const TArray<TSharedPtr<FJsonValue>> *&Info)
 		int32 x = obj[1]->AsNumber();
 		int32 y = obj[2]->AsNumber();
 		int32 heading = obj[3]->AsNumber();
-		map->InitOrUpdatePeople(id, x, y, heading, CurrentWorld);
+		gamamap->InitOrUpdatePeople(id, x, y, heading, CurrentWorld);
 		ids.Add(id);
 	}
 	// Remove absent people
 	// TArray<int> old_people_ids = map->GetPeopleIds(); // we explicitly make a copy
-	for (int id : map->GetPeopleIds())
-	{
-		if (!ids.Contains(id))
-		{
-			// map->RemovePeople(id);
-		}
-	}
+	// for (int id : gamamap->GetPeopleIds())
+	// {
+	// 	if (!ids.Contains(id))
+	// 	{
+	// 		// map->RemovePeople(id);
+	// 	}
+	// }
 }
 
 AObjectHandler::~AObjectHandler()
 {
-	delete map;
+	delete gamamap;
 }
 
 // Called when the game starts or when spawned
 void AObjectHandler::BeginPlay()
 {
 	Super::BeginPlay();
-	map->Init(CurrentWorld);
+	gamamap->Init(CurrentWorld);
 }
 
 void AObjectHandler::EndPlay(const EEndPlayReason::Type reason)

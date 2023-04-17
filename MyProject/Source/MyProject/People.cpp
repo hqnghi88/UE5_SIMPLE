@@ -15,14 +15,15 @@ APeople::APeople()
 	position.Y = 0;
 	position.Z = 0;
 
-	// StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
-	// // Load the car
-	// UStaticMesh* mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_vehicule.SM_vehicule'")).Object;
+	// Load the car
+	UStaticMesh* mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'")).Object;
 
-	// StaticMesh->SetStaticMesh(mesh);
-	// StaticMesh->SetMobility(EComponentMobility::Movable);
-	// RootComponent = StaticMesh;
+	StaticMesh->SetStaticMesh(mesh);
+	// StaticMesh->SetSimulatePhysics(true);
+	StaticMesh->SetMobility(EComponentMobility::Movable);
+	RootComponent = StaticMesh;
 	
 }
 
@@ -32,6 +33,7 @@ void APeople::Init(int32 ID, float x, float y, float rotation)
 	id = ID;
 	position.X = x;
 	position.Y = y;
+	position.Z = 300;
 	heading = FRotator(0, rotation,0);
 
 	//not needed anymore
@@ -82,6 +84,7 @@ void APeople::SetPosition(float x, float y, float rotation)
 {
 	position.X = x;
 	position.Y = y;
+	position.Z = 300;
 	this->heading = FRotator(0, rotation, 0);
 	SetActorLocationAndRotation(position, heading, true);
 }

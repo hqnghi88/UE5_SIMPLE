@@ -39,10 +39,10 @@ public:
 	void Init(UWorld* CurrentWorld);
 
 	void InitOrUpdatePeople(int id, double x, double y, double heading, UWorld* CurrentWorld);
-	void RemovePeople();
-	void SetBuildingVisible(ABuilding::BuildingTypes t, int id) const;
+	void RemovePeople(int id);
+	// void SetBuildingVisible(ABuilding::BuildingTypes t, int id) const;
 
-	void ToggleBuilding(ABuilding::BuildingTypes t, int id) const;
+	// void ToggleBuilding(ABuilding::BuildingTypes t, int id) const;
 
 
 	inline APeople* GetPeople(int id) const {

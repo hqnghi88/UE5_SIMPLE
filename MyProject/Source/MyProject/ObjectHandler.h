@@ -44,7 +44,7 @@ public:
 	// Sets default values for this actor's properties
 	AObjectHandler();
 
-	GamaMap* map;
+	GamaMap *gamamap;
 	UWorld *CurrentWorld;
 	//bool id_found(int32 ID, TArray<int32> ids);
 
@@ -57,7 +57,7 @@ public:
 	//TArray<AEmptyBuilding*> GetEmptyBuildings();
 	//TArray<AOffice*> GetOffices();
 	//TArray<APeople*> GetPeoples();
-
+ 
 	// Handle changes in the model
 	void HandleObject(TSharedPtr<FJsonObject> MyJson);
 	void HandleBuilding(const TArray<TSharedPtr<FJsonValue>>*& Info);

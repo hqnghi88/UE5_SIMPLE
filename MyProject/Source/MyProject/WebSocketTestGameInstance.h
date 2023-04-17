@@ -7,6 +7,7 @@
 #include "IWebSocket.h" 
 #include "ObjectHandler.h"
 #include "GamaClient.h" 
+#include "GamaMap.h"  
 #include "WebSocketTestGameInstance.generated.h"
 /**
  *
@@ -25,6 +26,7 @@ class MYPROJECT_API UWebSocketTestGameInstance : public UGameInstance
 public:
 	//Gama server handling
 	GamaClient* client; 
+	GamaMap* gamam; 
 
 	//ObjectHandler* ObjHandler;
 	AObjectHandler* ObjHandler;

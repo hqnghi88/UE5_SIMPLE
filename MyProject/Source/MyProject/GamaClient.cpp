@@ -18,6 +18,14 @@ GamaClient::GamaClient()
     this->message_handler = this;
 }
 
+GamaClient::GamaClient(AObjectHandler *objHdlr)
+{
+    _exp_id = 0;
+    _socket_id = 0;
+    ObjHandler=objHdlr;
+    this->message_handler = this;
+}
+
 GamaClient::GamaClient(FString url, int32 port, AObjectHandler *objHdlr)
 {
     _exp_id = 0;
@@ -26,7 +34,7 @@ GamaClient::GamaClient(FString url, int32 port, AObjectHandler *objHdlr)
     const FString ServerProtocol = FString("ws");                                                            // The WebServer protocol you want to use
     Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
     ObjHandler=objHdlr;
-    this->message_handler = new GamaClient();
+    this->message_handler = new GamaClient(objHdlr);
 }
 
 bool GamaClient::IsConnected() const
@@ -435,8 +443,8 @@ void GamaClient::HandleCommandExecutedSuccessfully(TSharedPtr<FJsonObject> MyJso
             //     if (MyJson->TryGetObjectField("content", BuildingInfo))
             //     {
                 
-                GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "sssss");
-            ObjHandler->HandleObject(MyJson);
+                // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "sssss");
+            ObjHandler->HandleObject(MyJson); 
             //         // FString ttt;
             //         // (*BuildingInfo)->TryGetStringField("type", ttt);
             //     }

@@ -2,11 +2,11 @@
 
 
 #include "GamaMap.h"
+#include "People.h"
 #include <string>
 
 GamaMap::GamaMap()
-{ 
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "map");
+{  
 }
 
 void GamaMap::Init(UWorld* CurrentWorld)
@@ -44,86 +44,87 @@ void GamaMap::Init(UWorld* CurrentWorld)
 
 }
 
-void GamaMap::InitOrUpdatePeople(int id, double x, double y, double heading, UWorld* CurrentWorld)
+void GamaMap::InitOrUpdatePeople(int32 id, double x, double y, double heading, UWorld* CurrentWorld)
 {
-	// int new_x = x_offset + scaling_factor * x;
-	// int new_y = y_offset + scaling_factor * y;
+	int new_x = x;//x_offset + scaling_factor * x;
+	int new_y = y;//y_offset + scaling_factor * y;
 	
-	// if (People.Contains(id)) {
-	// 	People[id]->SetPosition(new_x, new_y, heading);
-	// }
-	// else {
-
-	// 	const FVector* loc = new FVector(new_x, new_y, 0);
-	// 	APeople* people = (APeople*)CurrentWorld->SpawnActor(APeople::StaticClass(), loc,new FRotator(0,heading,0));
-	// 	if (people != nullptr)
-	// 	{
-	// 		people->Init(id, new_x, new_y, heading);
-	// 		People.Add(id, people);
-	// 	}
-	// }
-
-}
-
-void GamaMap::RemovePeople( )
-{
-            // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(std::to_string(id).c_str())); 
-			
-	GLog->Log(FString(std::to_string(4).c_str()));
-	// People.Remove(id);
-}
-
-void GamaMap::SetBuildingVisible(ABuilding::BuildingTypes t, int id) const
-{
-	switch (t) {
-	case ABuilding::Empty:
-
-		Houses[id]->SetActorHiddenInGame(true);
-		Offices[id]->SetActorHiddenInGame(true);
-		Houses[id]->SetActorEnableCollision(false);
-		Offices[id]->SetActorEnableCollision(false);
+	if (People.Contains(id)) {
 		
-		EmptyBuildings[id]->SetActorHiddenInGame(false);
-		EmptyBuildings[id]->SetActorEnableCollision(true);
-		break;
-
-	case ABuilding::House:
-		
-		Offices[id]->SetActorHiddenInGame(true);
-		EmptyBuildings[id]->SetActorHiddenInGame(true);
-		Offices[id]->SetActorEnableCollision(false);
-		EmptyBuildings[id]->SetActorEnableCollision(false);
-
-		Houses[id]->SetActorHiddenInGame(false);
-		Houses[id]->SetActorEnableCollision(true);
-		
-		break;
-
-	case ABuilding::Office:
-		EmptyBuildings[id]->SetActorHiddenInGame(true);
-		Houses[id]->SetActorHiddenInGame(true);
-		EmptyBuildings[id]->SetActorEnableCollision(false);
-		Houses[id]->SetActorEnableCollision(false);
-
-		Offices[id]->SetActorHiddenInGame(false);
-		Offices[id]->SetActorEnableCollision(true);
-		
-		break;
+	GLog->Log(FString(std::to_string(id).c_str())); 
+		People[id]->SetPosition(new_x, new_y, heading);
 	}
+	else {
+
+		const FVector* loc = new FVector(new_x, new_y, 300);
+		APeople* people = (APeople*)CurrentWorld->SpawnActor(APeople::StaticClass(), loc,new FRotator(0,heading,0));
+		if (people != nullptr)
+		{
+			people->Init(id, new_x, new_y, heading);
+			People.Add(id, people);
+		}
+	}
+
 }
 
-void GamaMap::ToggleBuilding(ABuilding::BuildingTypes t, int id) const
+void GamaMap::RemovePeople(int id)
 {
-	ABuilding::BuildingTypes to_set_visible = ABuilding::Empty;
-	switch (t) {
-	case ABuilding::Empty:
-		to_set_visible = ABuilding::House;
-		break;
-	case ABuilding::House:
-		to_set_visible = ABuilding::Office;
-	}
-	SetBuildingVisible(to_set_visible, id);
-}
+	People.Remove(id);
+    // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green,"GamaMapPLEASE"); 
+	// GLog->Log(FString(std::to_string(4).c_str()));
+} 
+
+// void GamaMap::SetBuildingVisible(ABuilding::BuildingTypes t, int id) const
+// {
+// 	switch (t) {
+// 	case ABuilding::Empty:
+
+// 		Houses[id]->SetActorHiddenInGame(true);
+// 		Offices[id]->SetActorHiddenInGame(true);
+// 		Houses[id]->SetActorEnableCollision(false);
+// 		Offices[id]->SetActorEnableCollision(false);
+		
+// 		EmptyBuildings[id]->SetActorHiddenInGame(false);
+// 		EmptyBuildings[id]->SetActorEnableCollision(true);
+// 		break;
+
+// 	case ABuilding::House:
+		
+// 		Offices[id]->SetActorHiddenInGame(true);
+// 		EmptyBuildings[id]->SetActorHiddenInGame(true);
+// 		Offices[id]->SetActorEnableCollision(false);
+// 		EmptyBuildings[id]->SetActorEnableCollision(false);
+
+// 		Houses[id]->SetActorHiddenInGame(false);
+// 		Houses[id]->SetActorEnableCollision(true);
+		
+// 		break;
+
+// 	case ABuilding::Office:
+// 		EmptyBuildings[id]->SetActorHiddenInGame(true);
+// 		Houses[id]->SetActorHiddenInGame(true);
+// 		EmptyBuildings[id]->SetActorEnableCollision(false);
+// 		Houses[id]->SetActorEnableCollision(false);
+
+// 		Offices[id]->SetActorHiddenInGame(false);
+// 		Offices[id]->SetActorEnableCollision(true);
+		
+// 		break;
+// 	}
+// }
+
+// void GamaMap::ToggleBuilding(ABuilding::BuildingTypes t, int id) const
+// {
+// 	ABuilding::BuildingTypes to_set_visible = ABuilding::Empty;
+// 	switch (t) {
+// 	case ABuilding::Empty:
+// 		to_set_visible = ABuilding::House;
+// 		break;
+// 	case ABuilding::House:
+// 		to_set_visible = ABuilding::Office;
+// 	}
+// 	SetBuildingVisible(to_set_visible, id);
+// }
 
 
 GamaMap::~GamaMap()

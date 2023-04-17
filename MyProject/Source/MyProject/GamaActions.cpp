@@ -71,64 +71,7 @@ void AGamaActions::Tick(float DeltaTime)
 			GI->client->play(GI->client->message_handler->GetSocketId(), GI->client->message_handler->GetExpId(), true);
 			played = true;
 		}
-	}
-	// if (played && message_handler->GetExpId() > 0)
-	// {
-	// // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "expression");
-	// 	client->expression(message_handler->GetSocketId(), message_handler->GetExpId(), "to_geojson(BBox,'EPSG:4326',['color'])", "gogo");//);
-	// }
-
-	// // Connects to TCP server
-	// if (!tcp_connected && message_handler -> IsPlaying())
-	// {
-	// 	FIPv4Address IPAddress;
-	// 	FIPv4Address::Parse(GAMA_IP, IPAddress);
-	// 	FIPv4Endpoint Endpoint(IPAddress, TCP_PORT);
-
-	// 	TcpSocket = FTcpSocketBuilder(TEXT("TcpSocket")).AsReusable().Build();
-	// 	ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
-	// 	if (TcpSocket -> Connect(*SocketSubsystem->CreateInternetAddr(Endpoint.Address.Value, Endpoint.Port)))
-	// 	{
-	// 		// Sends a message to gama to confirm it's connected
-	// 		FString connection_str = FString("connected\n");
-	// 		int32 BytesSent;
-	// 		if (TcpSocket -> Send((const uint8*)  TCHAR_TO_ANSI(*connection_str), connection_str.Len(), BytesSent))
-	// 		{
-	// 			tcp_connected = true;
-	// 		}
-	// 	}
-	// }
-
-	// if (tcp_connected)
-	// {
-	// 	uint32 BufferSize;
-	// 	FString message = "";
-	// 	//we loop over everything that's pending to reconstitute the full message
-	// 	while (TcpSocket->HasPendingData(BufferSize)) {
-	// 		uint8* DataChunk = new uint8[BufferSize+1];
-	// 		int32 BytesRead;
-	// 		if (TcpSocket -> Recv(DataChunk, BufferSize, BytesRead) && BytesRead > 0)
-	// 		DataChunk[BufferSize] = '\0'; // needs to add the end of string symbol
-	// 		message += UTF8_TO_TCHAR(DataChunk);
-	// 		delete[] DataChunk;
-	// 	}
-
-	// 	if (message != "") {
-	// 		TSharedPtr<FJsonObject> MyJson;
-
-	// 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(*message);
-
-	// 		if (FJsonSerializer::Deserialize(Reader, MyJson))
-	// 		{
-	// 			UE_LOG(LogTemp, Display, TEXT("Received and deserialized: %s"), *message);
-	// 			ObjHandler->HandleObject(MyJson, GetWorld());
-	// 		}
-	// 		else {
-	// 			// The deserialization failed, handle this case
-	// 			UE_LOG(LogTemp, Display, TEXT("Unable to deserialize because: %s Message: %s"), *Reader->GetErrorMessage(), *message);
-	// 		}
-	// 	}
-	// }
+	} 
 }
 
 void AGamaActions::SendChange(int type, int32 ID) const

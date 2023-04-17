@@ -6,7 +6,9 @@
 
 #include "GamaActions.h"
 #include "GamaClient.h" 
+#include "GamaMap.h" 
 #include "ExpParameter.h" 
+#include "ObjectHandler.h"
 #include "Math/Vector.h"
 #include "Interfaces/IPv4/IPv4Address.h"
 #include "Interfaces/IPv4/IPv4Endpoint.h" 
@@ -29,6 +31,8 @@ void UWebSocketTestGameInstance::Init()
 	const FVector* Loc = new FVector(-1000, -1000, -1000);
 	ObjHandler = (AObjectHandler*)CurrentWorld->SpawnActor(AObjectHandler::StaticClass(), Loc);
 	ObjHandler->CurrentWorld=CurrentWorld;
+	gamam = new GamaMap();		 
+	ObjHandler->gamamap=gamam; 
 	client = new GamaClient(GAMA_URL, GAMA_SERVER_PORT,ObjHandler);
 	client -> connect();
 	// //ObjHandler = new ObjectHandler();
