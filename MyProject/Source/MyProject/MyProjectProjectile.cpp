@@ -45,13 +45,17 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent *HitComp, AActor *OtherActo
 		if (OtherComp->IsSimulatingPhysics())
 		{
 			OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(std::to_string(((APeople *)OtherComp)->GetID()).c_str()));
+			Destroy();
 		}
 
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString(std::to_string(((APeople *)OtherComp)->GetID()).c_str()));
+
+		if (OtherActor->GetClass()->IsChildOf(APeople::StaticClass()))
+		{
+			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, ((APeople *)OtherActor)->GetID());
+			((APeople *)OtherActor)->End();
 			Destroy();
+		}
 		// UWebSocketTestGameInstance* GameInstance = Cast<UWebSocketTestGameInstance>(GetGameInstance());
 
 		// if (GameInstance)

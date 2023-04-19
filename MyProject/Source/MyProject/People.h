@@ -13,13 +13,15 @@ class MYPROJECT_API APeople : public ACharacter
 
 private:
 	// Basic properties
-	int32 id;
+	int32 id=0;
 	FVector position;
 	FRotator heading;
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* StaticMesh; //Graphical representation
 
 public:
+	bool dead=false;
+	FString fname;
 	// Sets default values for this character's properties
 	APeople();
 
@@ -29,8 +31,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	// virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
+	void End();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -40,6 +44,7 @@ public:
 public:
 	// get and set people parameters
 	int32 GetID();
+	FString GetName();
 	void SetID(int32 ID);
 	int32 GetX();
 	int32 GetY();

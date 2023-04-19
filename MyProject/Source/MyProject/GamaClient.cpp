@@ -84,7 +84,7 @@ void GamaClient::connect() const
                                   {
 
         // This code will run when we receive a string message from the server.
-        UE_LOG(LogTemp, Display, TEXT("Message received: %s"), *FString(Message));
+        // UE_LOG(LogTemp, Display, TEXT("Message received: %s"), *FString(Message));
 
         TSharedPtr<FJsonObject> MyJson;
 
@@ -107,7 +107,8 @@ void GamaClient::connect() const
     Socket->OnMessageSent().AddLambda([](const FString &MessageString) -> void
                                       {
         // This code is called after we sent a message to the server.
-        UE_LOG(LogTemp, Display, TEXT("sent: %s"), *FString(MessageString)); });
+        // UE_LOG(LogTemp, Display, TEXT("sent: %s"), *FString(MessageString)); 
+        });
 
     // And we finally connect to the server.
     Socket->Connect();

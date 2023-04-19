@@ -91,21 +91,12 @@ void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson)
 	// The person "object" that is retrieved from the given json file
 	TSharedPtr<FJsonObject> PersonObject = JsonObject->GetObjectField("content");
 
-	GLog->Log("Type:" + PersonObject->GetStringField("type"));
-	// GLog->Log("Age:" + FString::FromInt(PersonObject->GetIntegerField("age")));
-	// FString IsActiveStr = (PersonObject->GetBoolField("isActive")) ? "Active" : "Inactive";
-	// GLog->Log("IsActive:" + IsActiveStr);
-	// GLog->Log("Latitude:" + FString::SanitizeFloat(PersonObject->GetNumberField("latitude")));
+	// GLog->Log("Type:" + PersonObject->GetStringField("type")); 
 
 	// Retrieving an array property and printing each field
-	TArray<TSharedPtr<FJsonValue>> objArray = PersonObject->GetArrayField("features");
-	GLog->Log("printing family names...");
+	TArray<TSharedPtr<FJsonValue>> objArray = PersonObject->GetArrayField("features"); 
 	for (int32 index = 0; index < objArray.Num(); index++)
-	{
-		// GLog->Log( objArray[index]->AsObject()->GetStringField("type")   );
-
-		// GLog->Log(objArray[index]->AsObject()->GetStringField("id"));
-		// GLog->Log(objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location"));
+	{ 
 		FString test = objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location");
 		std::string exampleString = std::string(TCHAR_TO_UTF8(*test));
 
