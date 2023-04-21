@@ -22,18 +22,20 @@ APeople::APeople()
 	UStaticMesh *mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'")).Object;
 
 	StaticMesh->SetStaticMesh(mesh);
+	StaticMesh->SetCollisionProfileName(TEXT("OverlapAll"));
+
 	// StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->SetMobility(EComponentMobility::Movable);
 	RootComponent = StaticMesh;
 }
 
-void APeople::Init(int32 ID, float x, float y, float rotation)
+void APeople::Init(int32 ID, float x, float y, float z, float rotation)
 {
 	// Set values for attributes
 	id = ID;
 	position.X = x;
 	position.Y = y;
-	position.Z = 400;
+	position.Z = z;
 	heading = FRotator(0, rotation, 0);
 	fname = FString("People" + FString(std::to_string(ID).c_str()));
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "init" + GetName());
@@ -115,11 +117,16 @@ int32 APeople::GetY()
 	return position.Y;
 }
 
-void APeople::SetPosition(float x, float y, float rotation)
+int32 APeople::GetZ()
+{
+	return position.Z;
+}
+
+void APeople::SetPosition(float x, float y, float z, float rotation)
 {
 	position.X = x;
 	position.Y = y;
-	position.Z = 400;
+	position.Z = z;
 	this->heading = FRotator(0, rotation, 0);
 	SetActorLocationAndRotation(position, heading, true);
 }

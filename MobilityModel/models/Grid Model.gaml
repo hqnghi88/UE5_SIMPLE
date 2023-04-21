@@ -11,21 +11,23 @@ model GridModel
 /* Insert your model definition here */
 global {
 	 
-	geometry shape <- square(4000);
+	geometry shape <- square(2000);
 	
-	
+	int zz<-100;
 	
 	init{	 
-		create BBox number:10;
+//		create BBox number:2 ;
 	}
-	reflex ss when: flip(0.0001){
-		create BBox;// number:rnd(10);
+	reflex ss when: length(BBox)<5 and flip(0.01){
+		create BBox{
+			location<-{location.x,location.y,zz};
+		}
 	}
  
 }
 
  species BBox skills:[moving]{
-	geometry shape<-cube(1);
+	geometry shape<-cube(10);
 	rgb color<-rnd_color(255);
 	reflex s{
 		do wander speed:0.1;
@@ -34,7 +36,7 @@ global {
 
 experiment grid_model type:gui {
 
-	//float minimum_cycle_duration <- 0.5#second;
+	float minimum_cycle_duration <- 0.01#second;
 
 	output{
 		

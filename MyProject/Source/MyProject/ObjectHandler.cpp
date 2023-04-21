@@ -114,9 +114,9 @@ void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson)
 		// for (const auto d : doublesVector)
 		// {
 		// }
-
+		int iid=objArray[index]->AsObject()->GetIntegerField("id");
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "error map");
-		gamamap->InitOrUpdatePeople(objArray[index]->AsObject()->GetIntegerField("id"), doublesVector[0], doublesVector[1], doublesVector[0], GetWorld());
+		gamamap->InitOrUpdatePeople(iid, doublesVector[0], doublesVector[1], doublesVector[2], doublesVector[0], GetWorld());
 	}
 
 	// 	const TArray<TSharedPtr<FJsonValue>> *BuildingInfo;
@@ -153,8 +153,9 @@ void AObjectHandler::HandlePeople(const TArray<TSharedPtr<FJsonValue>> *&Info)
 		int32 id = obj[0]->AsNumber();
 		int32 x = obj[1]->AsNumber();
 		int32 y = obj[2]->AsNumber();
-		int32 heading = obj[3]->AsNumber();
-		gamamap->InitOrUpdatePeople(id, x, y, heading, CurrentWorld);
+		int32 z = obj[3]->AsNumber();
+		int32 heading = obj[4]->AsNumber();
+		gamamap->InitOrUpdatePeople(id, x, y, z, heading, CurrentWorld);
 		ids.Add(id);
 	}
 	// Remove absent people

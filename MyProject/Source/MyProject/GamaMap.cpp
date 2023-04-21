@@ -42,12 +42,13 @@ void GamaMap::Init(UWorld *CurrentWorld)
 	// }
 }
 
-void GamaMap::InitOrUpdatePeople(int32 id, double x, double y, double heading, UWorld *CurrentWorld)
+void GamaMap::InitOrUpdatePeople(int32 id, double x, double y, double z, double heading, UWorld *CurrentWorld)
 {
 	// int new_x = x; // x_offset + scaling_factor * x;
 	// int new_y = y; // y_offset + scaling_factor * y;
-	int new_x =  x_offset + scaling_factor * x;
-	int new_y =  y_offset + scaling_factor * y;
+	int new_x = x_offset + scaling_factor * x;
+	int new_y = y_offset + scaling_factor * y;
+	int new_z = z_offset + scaling_factor * z;
 
 	if (People.Contains(id))
 	{
@@ -68,7 +69,7 @@ void GamaMap::InitOrUpdatePeople(int32 id, double x, double y, double heading, U
 			else
 			{
 
-				People[id]->SetPosition(new_x, new_y, heading);
+				People[id]->SetPosition(new_x, new_y, new_z, heading);
 			}
 		}
 		// }
@@ -79,13 +80,17 @@ void GamaMap::InitOrUpdatePeople(int32 id, double x, double y, double heading, U
 	}
 	else
 	{
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		Params.bDeferConstruction = true; // We defer construction so that we set ParentComponent prior to component registration so they appear selected
+		Params.bAllowDuringConstructionScript = true;
 
-		const FVector *loc = new FVector(new_x, new_y, 400);
-		APeople *people = (APeople *)CurrentWorld->SpawnActor(APeople::StaticClass(), loc, new FRotator(0, heading, 0));
+		const FVector *loc = new FVector(new_x, new_y, new_z);
+		APeople *people = (APeople *)CurrentWorld->SpawnActor(APeople::StaticClass(), loc, new FRotator(0, heading, 0), Params);
 		if (people != nullptr)
 		{
 
-			people->Init(id, new_x, new_y, heading);
+			people->Init(id, new_x, new_y, new_z, heading);
 			People.Add(id, people);
 		}
 	}

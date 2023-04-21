@@ -29,6 +29,7 @@ protected:
 	const int32 scaling_factor	= 1;
 	const int32 x_offset		= 0;
 	const int32 y_offset		= 0;
+	const int32 z_offset		= 0;
 
 
 public:
@@ -38,7 +39,7 @@ public:
 
 	void Init(UWorld* CurrentWorld);
 
-	void InitOrUpdatePeople(int id, double x, double y, double heading, UWorld* CurrentWorld);
+	void InitOrUpdatePeople(int id, double x, double y, double z, double heading, UWorld* CurrentWorld);
 	void RemovePeople(int id);
 	// void SetBuildingVisible(ABuilding::BuildingTypes t, int id) const;
 

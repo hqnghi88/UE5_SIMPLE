@@ -22,7 +22,7 @@ void AGamaActionsBBox::BeginPlay()
 {
 	Super::BeginPlay(); 
 
-	// SetActorTickInterval(5); 
+	SetActorTickInterval(1); 
 }
 
 void AGamaActionsBBox::EndPlay(const EEndPlayReason::Type EndPlayReason)

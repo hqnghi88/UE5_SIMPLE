@@ -26,7 +26,7 @@ public:
 	APeople();
 
 	// Sets customized values for this character's properties
-	void Init(int32 ID, float x, float y, float heading);
+	void Init(int32 ID, float x, float y, float z, float heading);
 
 protected:
 	// Called when the game starts or when spawned
@@ -48,5 +48,6 @@ public:
 	void SetID(int32 ID);
 	int32 GetX();
 	int32 GetY();
-	void SetPosition(float x, float y, float heading);
+	int32 GetZ();
+	void SetPosition(float x, float y, float z, float heading);
 };
