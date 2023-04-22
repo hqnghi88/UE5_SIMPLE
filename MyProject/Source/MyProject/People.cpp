@@ -18,8 +18,8 @@ APeople::APeople()
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
-	// Load the car
-	UStaticMesh *mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'")).Object;
+	// Load the carSM_ChamferCube
+	UStaticMesh *mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/LevelPrototyping/Meshes/SM_Ramp.SM_Ramp'")).Object;
 
 	StaticMesh->SetStaticMesh(mesh);
 	StaticMesh->SetCollisionProfileName(TEXT("OverlapAll"));
@@ -71,7 +71,7 @@ void APeople::End()
 
 		if (GI && GI->client->message_handler->playing)
 		{
-			GI->client->expression(GI->client->message_handler->GetSocketId(), GI->client->message_handler->GetExpId(), "ask BBox(" + FString(std::to_string(id).c_str()) + "){do die;}", true); //);
+			GI->client->expression("dieBBox",GI->client->message_handler->GetSocketId(), GI->client->message_handler->GetExpId(), "ask BBox(" + FString(std::to_string(id).c_str()) + "){do die;}", true); //);
 			dead = true;
 		}
 	}

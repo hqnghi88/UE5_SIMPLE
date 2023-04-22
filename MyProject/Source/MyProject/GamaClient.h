@@ -52,7 +52,7 @@ public:
 	void stepBack(int64 socket_id, int32 exp_id, int32 steps = 1, bool sync = false) const;
 	void stop(int64 socket_id, int32 exp_id) const;
 	void reload(int64 socket_id, int32 exp_id, TArray<ExpParameter *> parameters = TArray<ExpParameter *>(), FString end_condition = "") const;
-	void expression(int64 socket_id, int32 exp_id, FString expr, bool esc = false) const; 
+	void expression(FString actname, int64 socket_id, int32 exp_id, FString expr, bool esc = false) const; 
 
 	virtual ~GamaClient();
 };

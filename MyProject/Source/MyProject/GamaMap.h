@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "EmptyBuilding.h"
-#include "Office.h"
-#include "House.h"
+#include "CoreMinimal.h" 
 #include "People.h"
-#include "Building.h"
+#include "Predator.h" 
 
 
 
@@ -19,11 +16,9 @@ class MYPROJECT_API GamaMap
 
 protected:
 
-	// Items lists
-	TArray<AEmptyBuilding*>	EmptyBuildings;
-	TArray<AOffice*>		Offices;
-	TArray<AHouse*>			Houses;
+	// Items lists 
 	TMap<int, APeople*>		People;
+	TMap<int, APredator*>		Predator;
 
 	// Transformation parameters to scale to the world coordinates
 	const int32 scaling_factor	= 1;
@@ -41,10 +36,8 @@ public:
 
 	void InitOrUpdatePeople(int id, double x, double y, double z, double heading, UWorld* CurrentWorld);
 	void RemovePeople(int id);
-	// void SetBuildingVisible(ABuilding::BuildingTypes t, int id) const;
-
-	// void ToggleBuilding(ABuilding::BuildingTypes t, int id) const;
-
+	void InitOrUpdatePredator(int id, double x, double y, double z, double heading, UWorld* CurrentWorld);
+	void RemovePredator(int id); 
 
 	inline APeople* GetPeople(int id) const {
 		if (!People.Contains(id)) {
@@ -62,6 +55,26 @@ public:
 	inline TArray<APeople*> GetPeople() const {
 		TArray<APeople*> out;
 		People.GenerateValueArray(out);
+		return out;
+	}
+
+
+	inline APredator* GetPredator(int id) const {
+		if (!Predator.Contains(id)) {
+			return nullptr;
+		}
+		return Predator[id];
+	}
+	
+	inline TArray<int> GetPredatorIds() const {
+		TArray<int> out;
+		Predator.GenerateKeyArray(out);
+		return out;
+	}
+
+	inline TArray<APredator*> GetPredator() const {
+		TArray<APredator*> out;
+		Predator.GenerateValueArray(out);
 		return out;
 	}
 

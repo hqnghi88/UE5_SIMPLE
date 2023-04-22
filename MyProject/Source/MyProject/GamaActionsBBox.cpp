@@ -3,7 +3,7 @@
 #include "GamaActionsBBox.h"
 #include "GamaClient.h"
 #include "ExpParameter.h"
-#include "Math/Vector.h" 
+#include "Math/Vector.h"
 #include "Common/TcpSocketBuilder.h"
 #include "ObjectHandler.h"
 #include "WebSocketTestGameInstance.h"
@@ -20,9 +20,9 @@ AGamaActionsBBox::AGamaActionsBBox()
 // Called when the game starts or when spawned
 void AGamaActionsBBox::BeginPlay()
 {
-	Super::BeginPlay(); 
+	Super::BeginPlay();
 
-	SetActorTickInterval(1); 
+	// SetActorTickInterval(1);
 }
 
 void AGamaActionsBBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -48,15 +48,13 @@ void AGamaActionsBBox::Tick(float DeltaTime)
 
 	if (GI && GI->client->message_handler->playing)
 	{
- 
-			  
-		GI->client->expression(GI->client->message_handler->GetSocketId(), GI->client->message_handler->GetExpId(), "to_geojson(BBox,'EPSG:4326',['location'])", true);//);
-	  
-		 
-	} 
+
+		int sid = GI->client->message_handler->GetSocketId();
+		int eid = GI->client->message_handler->GetExpId();
+		GI->client->expression("BBox", sid, eid, "to_geojson(BBox,'EPSG:4326',['location'])", true); //);
+	}
 }
 
 void AGamaActionsBBox::SendChange(int type, int32 ID) const
 {
-	
 }

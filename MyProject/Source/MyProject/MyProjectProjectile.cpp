@@ -4,6 +4,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "People.h"
+#include "Predator.h"
 #include "WebSocketTestGameInstance.h"
 #include <string>
 AMyProjectProjectile::AMyProjectProjectile()
@@ -54,6 +55,12 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent *HitComp, AActor *OtherActo
 		{
 			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, ((APeople *)OtherActor)->GetID());
 			((APeople *)OtherActor)->End();
+			Destroy();
+		}else
+		if (OtherActor->GetClass()->IsChildOf(APredator::StaticClass()))
+		{
+			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, ((APeople *)OtherActor)->GetID());
+			((APredator *)OtherActor)->End();
 			Destroy();
 		}
 		// UWebSocketTestGameInstance* GameInstance = Cast<UWebSocketTestGameInstance>(GetGameInstance());

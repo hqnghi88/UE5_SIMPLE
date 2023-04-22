@@ -314,7 +314,7 @@ void GamaClient::reload(int64 socket_id, int32 exp_id, TArray<ExpParameter *> pa
     Socket->Send(reload_command);
 }
 
-void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, bool esc) const
+void GamaClient::expression(FString actname, int64 socket_id, int32 exp_id, FString expr, bool esc) const
 {
     if (!message_handler->connected) //! Socket->IsConnected())
     {
@@ -329,6 +329,7 @@ void GamaClient::expression(int64 socket_id, int32 exp_id, FString expr, bool es
         \"exp_id\": \"") + FString(std::to_string(exp_id).c_str()) +
                                  FString("\",\
         \"expr\": \"") + expr + FString("\",\
+        \"actname\": \"") + actname + FString("\",\
         \"escaped\": \"") + (esc ? "true" : "false") + FString("\",\
     }");
 

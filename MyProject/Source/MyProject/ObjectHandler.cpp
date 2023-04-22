@@ -85,40 +85,78 @@ AObjectHandler::AObjectHandler()
 
 void AObjectHandler::HandleObject(TSharedPtr<FJsonObject> MyJson)
 {
-	// Create a json object to store the information from the json string
-	// The json reader is used to deserialize the json object later on
-	TSharedPtr<FJsonObject> JsonObject = MyJson; // MakeShareable(new FJsonObject());
-	// The person "object" that is retrieved from the given json file
-	TSharedPtr<FJsonObject> PersonObject = JsonObject->GetObjectField("content");
+	TSharedPtr<FJsonObject> CmdObject = MyJson->GetObjectField("command");
+	FString actname = CmdObject->GetStringField("actname");
+	// GLog->Log("Type:" + actname);
+	if (actname == "BBox")
+	{
 
-	// GLog->Log("Type:" + PersonObject->GetStringField("type")); 
+		TSharedPtr<FJsonObject> JsonObject = MyJson;
+		TSharedPtr<FJsonObject> PersonObject = JsonObject->GetObjectField("content");
 
-	// Retrieving an array property and printing each field
-	TArray<TSharedPtr<FJsonValue>> objArray = PersonObject->GetArrayField("features"); 
-	for (int32 index = 0; index < objArray.Num(); index++)
-	{ 
-		FString test = objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location");
-		std::string exampleString = std::string(TCHAR_TO_UTF8(*test));
+		// GLog->Log("Type:" + PersonObject->GetStringField("type"));
 
-		exampleString.front() = exampleString.back() = ' ';
-		std::replace(exampleString.begin(), exampleString.end(), ',', ' ');
+		// Retrieving an array property and printing each field
+		TArray<TSharedPtr<FJsonValue>> objArray = PersonObject->GetArrayField("features");
+		for (int32 index = 0; index < objArray.Num(); index++)
+		{
+			FString test = objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location");
+			std::string exampleString = std::string(TCHAR_TO_UTF8(*test));
 
-		// Create stringstream from string.
-		auto iss = std::istringstream(exampleString);
+			exampleString.front() = exampleString.back() = ' ';
+			std::replace(exampleString.begin(), exampleString.end(), ',', ' ');
 
-		// Create vector of doubles from stringstream.
-		const auto doublesVector = std::vector<double>(std::istream_iterator<double>(iss),
-													   std::istream_iterator<double>());
-		// FVector fv=new FVector(doublesVector[0],doublesVector[1],doublesVector[2]);
-		// GLog->Log(FString(std::to_string(doublesVector[0]).c_str()));
-		// for (const auto d : doublesVector)
-		// {
-		// }
-		int iid=objArray[index]->AsObject()->GetIntegerField("id");
-		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "error map");
-		gamamap->InitOrUpdatePeople(iid, doublesVector[0], doublesVector[1], doublesVector[2], doublesVector[0], GetWorld());
+			// Create stringstream from string.
+			auto iss = std::istringstream(exampleString);
+
+			// Create vector of doubles from stringstream.
+			const auto doublesVector = std::vector<double>(std::istream_iterator<double>(iss),
+														   std::istream_iterator<double>());
+			// FVector fv=new FVector(doublesVector[0],doublesVector[1],doublesVector[2]);
+			// GLog->Log(FString(std::to_string(doublesVector[0]).c_str()));
+			// for (const auto d : doublesVector)
+			// {
+			// }
+			int iid = objArray[index]->AsObject()->GetIntegerField("id");
+			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "error map");
+			gamamap->InitOrUpdatePeople(iid, doublesVector[0], doublesVector[1], doublesVector[2], doublesVector[0], GetWorld());
+		}
 	}
 
+	if (actname == "predator")
+	{
+
+		TSharedPtr<FJsonObject> JsonObject = MyJson;
+		TSharedPtr<FJsonObject> PersonObject = JsonObject->GetObjectField("content");
+
+		// GLog->Log("Type:" + PersonObject->GetStringField("type"));
+
+		// Retrieving an array property and printing each field
+		TArray<TSharedPtr<FJsonValue>> objArray = PersonObject->GetArrayField("features");
+		for (int32 index = 0; index < objArray.Num(); index++)
+		{
+			FString test = objArray[index]->AsObject()->GetObjectField("properties")->GetStringField("location");
+			std::string exampleString = std::string(TCHAR_TO_UTF8(*test));
+
+			exampleString.front() = exampleString.back() = ' ';
+			std::replace(exampleString.begin(), exampleString.end(), ',', ' ');
+
+			// Create stringstream from string.
+			auto iss = std::istringstream(exampleString);
+
+			// Create vector of doubles from stringstream.
+			const auto doublesVector = std::vector<double>(std::istream_iterator<double>(iss),
+														   std::istream_iterator<double>());
+			// FVector fv=new FVector(doublesVector[0],doublesVector[1],doublesVector[2]);
+			// GLog->Log(FString(std::to_string(doublesVector[0]).c_str()));
+			// for (const auto d : doublesVector)
+			// {
+			// }
+			int iid = objArray[index]->AsObject()->GetIntegerField("id");
+			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "error map");
+			gamamap->InitOrUpdatePredator(iid, doublesVector[0], doublesVector[1], doublesVector[2], doublesVector[0], GetWorld());
+		}
+	}
 	// 	const TArray<TSharedPtr<FJsonValue>> *BuildingInfo;
 	// 	const TArray<TSharedPtr<FJsonValue>> *PeopleInfo;
 

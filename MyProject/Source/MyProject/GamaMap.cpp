@@ -2,6 +2,7 @@
 
 #include "GamaMap.h"
 #include "People.h"
+#include "Predator.h"
 #include <string>
 
 GamaMap::GamaMap()
@@ -99,6 +100,67 @@ void GamaMap::InitOrUpdatePeople(int32 id, double x, double y, double z, double 
 void GamaMap::RemovePeople(int id)
 {
 	People.Remove(id);
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green,"GamaMapPLEASE");
+	// GLog->Log(FString(std::to_string(4).c_str()));
+}
+
+
+void GamaMap::InitOrUpdatePredator(int32 id, double x, double y, double z, double heading, UWorld *CurrentWorld)
+{
+	// int new_x = x; // x_offset + scaling_factor * x;
+	// int new_y = y; // y_offset + scaling_factor * y;
+	int new_x = x_offset + scaling_factor * x;
+	int new_y = y_offset + scaling_factor * y;
+	int new_z = z_offset + scaling_factor * z;
+
+	if (Predator.Contains(id))
+	{
+		// try
+		// {
+
+		// GLog->Log(FString(std::to_string(id).c_str()));
+		if (Predator[id] != nullptr)
+		{
+			if (Predator[id]->dead)
+			{
+				Predator[id]->SetActorHiddenInGame(true);
+				Predator[id]->SetActorEnableCollision(false);
+				Predator[id]->End();
+				// People[id]->Destroy();
+				// People.Remove(id);
+			}
+			else
+			{
+
+				Predator[id]->SetPosition(new_x, new_y, new_z, heading);
+			}
+		}
+		// }
+		// catch (const std::exception &e)
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("error "), *e.what());
+		// }
+	}
+	else
+	{
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		Params.bDeferConstruction = true; // We defer construction so that we set ParentComponent prior to component registration so they appear selected
+		Params.bAllowDuringConstructionScript = true;
+
+		const FVector *loc = new FVector(new_x, new_y, new_z);
+		APredator *preadtor = (APredator *)CurrentWorld->SpawnActor(APredator::StaticClass(), loc, new FRotator(0, heading, 0), Params);
+		if (preadtor != nullptr)
+		{
+
+			preadtor->Init(id, new_x, new_y, new_z, heading);
+			Predator.Add(id, preadtor);
+		}
+	}
+}
+void GamaMap::RemovePredator(int id)
+{
+	Predator.Remove(id);
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green,"GamaMapPLEASE");
 	// GLog->Log(FString(std::to_string(4).c_str()));
 }
