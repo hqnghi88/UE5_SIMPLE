@@ -17,7 +17,8 @@ private:
 	FVector position;
 	FRotator heading;
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* StaticMesh; //Graphical representation
+	USkeletalMeshComponent* StaticMesh; //Graphical representation
+	UAnimationAsset* ANIM_Zebra_Gallop;
 
 public:
 	bool dead=false;

@@ -15,15 +15,23 @@ APredator::APredator()
 	position.X = 0;
 	position.Y = 0;
 	position.Z = 0;
+ 
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	// 	
+	StaticMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 
-	// Load the car
-	UStaticMesh *mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'")).Object;
+	// None
+	USkeletalMesh *mesh = ConstructorHelpers::FObjectFinder<USkeletalMesh>(TEXT("/Script/Engine.SkeletalMesh'/Game/AfricanAnimalsPack/LionAndLioness/Meshes/SK_Lion_LOD0.SK_Lion_LOD0'")).Object;
 
-	StaticMesh->SetStaticMesh(mesh);
-	StaticMesh->SetCollisionProfileName(TEXT("OverlapAll"));
-
+	StaticMesh->SetSkeletalMeshAsset(mesh);
+	StaticMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);  
+	ANIM_Lion_Run= ConstructorHelpers::FObjectFinder<UAnimationAsset>(TEXT("/Script/Engine.AnimSequence'/Game/AfricanAnimalsPack/LionAndLioness/Animations/ANIM_Lion_Run.ANIM_Lion_Run'")).Object;
+	 
+	  
+	 
+	StaticMesh->OverrideAnimationData(ANIM_Lion_Run);
+	
+	StaticMesh->SetCollisionProfileName(TEXT("OverlapAll")); 
 	// StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->SetMobility(EComponentMobility::Movable);
 	RootComponent = StaticMesh;
@@ -48,6 +56,7 @@ void APredator::Init(int32 ID, float x, float y, float z, float rotation)
 void APredator::BeginPlay()
 {
 	Super::BeginPlay();
+	StaticMesh->PlayAnimation(ANIM_Lion_Run,true);
 }
 
 // void APredator::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -128,5 +137,6 @@ void APredator::SetPosition(float x, float y, float z, float rotation)
 	position.Y = y;
 	position.Z = z;
 	this->heading = FRotator(0, rotation, 0);
-	SetActorLocationAndRotation(position, heading, true);
+	SetActorLocation(position);
+	//SetActorLocationAndRotation(position, heading, true);
 }

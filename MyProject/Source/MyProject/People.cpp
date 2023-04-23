@@ -16,14 +16,20 @@ APeople::APeople()
 	position.Y = 0;
 	position.Z = 0;
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	StaticMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 
-	// Load the carSM_ChamferCube
-	UStaticMesh *mesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/LevelPrototyping/Meshes/SM_Ramp.SM_Ramp'")).Object;
+	// None
+	USkeletalMesh *mesh = ConstructorHelpers::FObjectFinder<USkeletalMesh>(TEXT("/Script/Engine.SkeletalMesh'/Game/AfricanAnimalsPack/Zebra/Meshes/SK_Zebra.SK_Zebra'")).Object;
 
-	StaticMesh->SetStaticMesh(mesh);
-	StaticMesh->SetCollisionProfileName(TEXT("OverlapAll"));
-
+	StaticMesh->SetSkeletalMeshAsset(mesh);
+	StaticMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);  
+	ANIM_Zebra_Gallop= ConstructorHelpers::FObjectFinder<UAnimationAsset>(TEXT("/Script/Engine.AnimSequence'/Game/AfricanAnimalsPack/Zebra/Animations/ANIM_Zebra_Gallop.ANIM_Zebra_Gallop'")).Object;
+	 
+	  
+	 
+	StaticMesh->OverrideAnimationData(ANIM_Zebra_Gallop);
+	
+	StaticMesh->SetCollisionProfileName(TEXT("OverlapAll")); 
 	// StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->SetMobility(EComponentMobility::Movable);
 	RootComponent = StaticMesh;
@@ -48,6 +54,7 @@ void APeople::Init(int32 ID, float x, float y, float z, float rotation)
 void APeople::BeginPlay()
 {
 	Super::BeginPlay();
+	StaticMesh->PlayAnimation(ANIM_Zebra_Gallop,true);
 }
 
 // void APeople::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -79,7 +86,7 @@ void APeople::End()
 // Called every frame
 void APeople::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime); 
 }
 
 // Called to bind functionality to input
@@ -127,6 +134,9 @@ void APeople::SetPosition(float x, float y, float z, float rotation)
 	position.X = x;
 	position.Y = y;
 	position.Z = z;
-	this->heading = FRotator(0, rotation, 0);
-	SetActorLocationAndRotation(position, heading, true);
+	this->heading = FRotator(0, rotation, 0); 
+
+	SetActorLocation(position);
+	//SetActorLocationAndRotation(position, heading, true);
+	StaticMesh->PlayAnimation(ANIM_Zebra_Gallop, true);
 }

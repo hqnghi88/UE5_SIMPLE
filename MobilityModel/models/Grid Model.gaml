@@ -1,163 +1,159 @@
 /**
-* Name: prey predator
-* Author: HUYNH Quang Nghi
-* Description: This is a simple comodel serve to demonstrate the mixing behaviors of preyPredator with the Ants. Ants are the prey, fleeing from Predators, when they are not chasing, they try to do job of the ants.
-* Tags: comodel
+* Name: Boids 3D Motion
+* Author: 
+* Description: This model shows the movement of boids following a goal, and creating a flock .  
+*	The goal agent and the boids will move within the 3D space.
+* Tags: gui, skill, 3d
 */
-model prey_predator
-
-
-global
-{
-	geometry shape <- square(8000);
-	float perceipt_radius <- 1000.0;
-	int preyinit <- 150;
-	int predatorinit <- 3;
-	list<agent> lstPredator;// <- list<agent> (predator);
-	list<agent> lstPrey; //<- list<agent> (prey);
-	init
-	{
-		create BBox number: preyinit;
-		create predator number: predatorinit;
-		lstPredator <- list<agent> (predator);
-		lstPrey <- list<agent> (BBox);
+model boids_3D 
+global torus: torus_environment{ 
+	//Number of boids to create
+	int number_of_agents parameter: 'Number of agents' <- 100 min: 1 max: 500;
+	//Number of obstacles to create
+	int number_of_obstacles parameter: 'Number of obstacles' <- 0 min: 0;
+	//Size of the boids
+	int boids_size parameter: 'Boids size' <- 50 min: 1;
+	//Maximal speed of the boids
+	float maximal_speed parameter: 'Maximal speed' <- 15.0 min: 0.1 max: 15.0;
+	//Factor for the boids flock
+	int cohesion_factor parameter: 'Cohesion Factor' <- 5000; 
+	int alignment_factor parameter: 'Alignment Factor' <- 5000; 
+	float minimal_distance parameter: 'Minimal Distance' <- 200.0; 
+	//MAximal angle of turn for the boids
+	int maximal_turn parameter: 'Maximal Turn' <- 359 min: 0 max: 359; 
+	//environment parameters
+	int width_and_height_of_environment parameter: 'Width/Height of the Environment' <- 4000;  
+	int z_max parameter: 'Z max of the Environment' <- 4000;  
+	bool torus_environment parameter: 'Toroidal Environment ?' <- false; 
+	//Experiment parameter
+	bool apply_cohesion <- true parameter: 'Apply Cohesion ?';
+	bool apply_alignment <- true parameter: 'Apply Alignment ?';   
+	bool apply_separation <- true parameter: 'Apply Separation ?';   
+	bool apply_goal <- true parameter: 'Follow Goal ?'; 
+	bool apply_wind <- true parameter: 'Apply Wind ?';     
+	//Wind variable
+	point wind_vector <- {0,0,0}  parameter: 'Direction of the wind';   
+	//Duration of the goal
+	int goal_duration <- 30 update: (goal_duration - 1); 
+	//Location of the goal
+	point goal <- {rnd (width_and_height_of_environment - 2) + 1, rnd (width_and_height_of_environment -2) + 1 ,(rnd(z_max - 2) + 1)}; 
+ 
+	geometry shape <- cube(width_and_height_of_environment);
+	init {
+		//Creation of the boids agents that will be placed randomly within the environment
+		create BBox number: number_of_agents { 
+			location <- {rnd (width_and_height_of_environment - 2) + 1, rnd (width_and_height_of_environment -2) + 1 , (rnd(z_max - 2) + 1)};
+		} 
+		//Creation of the goal
+		create predator {
+			location <- goal;
+		}
 	}
-
 }
 
-species generic_species skills: [moving]
-{
-	float speed <- 10.0;
-	point goal;
-	bool is_chased <- false;
-	reflex live_with_my_goal
-	{
-		if (goal != nil)
-		{
-//			do wander speed: speed;
-			do goto target: goal speed: speed;
-		} else
-		{
-			do wander amplitude:359.0 speed: speed;
-		}
-
-	}
-
-}
-
-species BBox parent: generic_species
-{
-	geometry shape <- circle(100);
-	float speed <- 2.0;
-	rgb color <- # green;
-	reflex fleeing
-	{
-		if (length((lstPredator where (each != nil and !dead(each) and each distance_to self < perceipt_radius))) > 0)
-		{
-			speed <- 15.0;
-			is_chased <- true;
-			color <- # lime;
-			if (goal = nil)
-			{
-				agent a <- any(((lstPrey where (each != nil and !dead(each) and !generic_species(each).is_chased))));
-				if (a != nil and !dead(a))
-				{
-					if (flip(0.5))
-					{
-						goal <- a.location;
-					} else
-					{
-						goal <- any_location_in(world.shape);
-					}
-
-				} else
-				{
-					goal <- any_location_in(world.shape);
-				}
-
-			}
-
-		}
-
-		if (goal != nil and self.location distance_to goal < 50)
-		{
-			goal <- nil;
-		}
-
-		if (length((lstPredator where (each != nil and !dead(each))) where (each distance_to self <= perceipt_radius)) = 0)
-		{
-			is_chased <- false;
-			color <- # green;
-			speed <- 2.0;
-		}
-
-	}
-
-	aspect default
-	{
-		draw shape color: color;
-	}
-
-}
-
-species predator parent: generic_species
-{
-	geometry shape <- triangle(300);
-	rgb color <- # red;
-	reflex hunting
-	{
-		if (goal = nil)
-		{
-			list tmp <- (lstPrey where (!dead(each) and each.shape distance_to self.shape < perceipt_radius));
-			if (length(tmp) > 0)
-			{
-				agent a <- first(tmp sort (each.shape distance_to self.shape));
-				if (a = nil)
-				{
-					a <- any((lstPrey where (!dead(each))));
-				}
-
-				if (a != nil)
-				{
-					speed <- 25.0;
-					goal <- a.location;
-				}
-
-			}
-
-		} else if ((self.location distance_to goal < 25))
-		{
-			ask lstPrey where (!dead(each) and each.location distance_to goal < 25)
-			{
-				do die;
-			}
-
-			goal <- nil;
-			speed <- 15.0;
-		}
-
-	}
-
-	aspect default
-	{
-		draw circle(perceipt_radius) color: # pink wireframe: true;
-		draw shape color: color rotate: 90 + my heading;
-	}
-
-}
-
-experiment grid_model type:gui 
-{
+//Species boids_goal that will represent the goal agent, using the skill moving
+species predator skills: [moving3D] {
+	float range init: 20.0;
 	
-	float minimum_cycle_duration <- 0.01#second;
-	output
-	{
-		display main_display
-		{
-			species BBox;
-			species predator;
+	//Reflex to make the goal agent wander in a certain amplitude and a certain speed, 
+	//Respecting the minimal and maximal z values
+	reflex wander { 
+		do  wander amplitude: 45.0 speed: 20.0; 
+		if (location.z) < 0 {
+			location <- {location.x,location.y,0};
+		} else if (location.z) > z_max {
+			location <- {location.x,location.y,z_max};
 		}
+		goal <- location;
+	}
+	
+	aspect default { 
+		draw sphere(10) color: #red ;
+	}
+} 
+
+//Species boids that will represent the boids agents, using the skill moving
+species BBox skills: [moving3D] {
+	
+	//Attribute for the speed of the boids
+	float speed max: maximal_speed <- maximal_speed;
+	//Range of sensing of the boids
+	float range <- minimal_distance * 2;
+	point velocity <- {0,0, 0} ;
+	
+	//List of the others boids in the range distance of the agent
+	list others update: ((BBox at_distance range)  - self);
+	//Mass center of the "flock" represented as the other boids in the sensing range
+	point mass_center update:  (length(others) > 0) ? (mean (others collect (each.location)) )  : location;
+	
+	//Reflex to apply separation
+	reflex separation when: apply_separation {
+		point acc <- {0,0,0};
+		loop boid over: (BBox at_distance (minimal_distance))  {
+			acc <- acc - ((location of boid) - location);
+		}  
+		velocity <- velocity + acc;
+	}
+	//Reflex to apply alignment
+	reflex alignment when: apply_alignment {
+		point acc <- (length(others) > 0) ? (mean (others collect (each.velocity))) : {0.0,0.0,0.0};
+		acc <- acc - velocity;
+		velocity <- velocity + (acc / alignment_factor);
+	}
+	//Reflex to apply cohesion
+	reflex cohesion when: apply_cohesion {
+		point acc <- mass_center - location;
+		acc <- acc / cohesion_factor;
+		velocity <- velocity + acc; 
+	}
+	//Action to make the agent location within the environment
+	action bounding {
+		if (location.z) < 0 {
+			location <- {location.x,location.y,0};
+		} else if (location.z) > z_max {
+			location <- {location.x,location.y,z_max};
+		}
+	}
+	//Reflex to make the agent follow the goal
+	reflex follow_goal when: apply_goal {
+		velocity <- velocity + ((goal - location) / cohesion_factor);
+	}
+	//Reflex to apply the wind by using the vector of wind
+	reflex wind when: apply_wind {
+		velocity <- velocity + wind_vector;
+	}
+	//Action to make the agent moving
+	action do_move {  
+		if (((velocity.x) as int) = 0) and (((velocity.y) as int) = 0) and (((velocity.z) as int) = 0) {
+			velocity <- {(rnd(4)) -2, (rnd(4)) - 2,  ((rnd(4)) - 2)} ; 
+		}
+		point old_location <- location;
+		do goto target: location + velocity;
+		velocity <- location - old_location;
+	}
+	//Reflex to move the agent, calling both bounding and do_move action
+	reflex movement {
+		do bounding;
+		do do_move;
+	}
+	
+	aspect sphere {
+		draw sphere(50) color: #green;
+	}
+	 
+}
+
+
+experiment grid_model type: gui {
+	
+	
+	output  {
+		
+		display Sky1 type:3d axes:true{
+			species BBox aspect: sphere;
+			species predator;	
+		}
+		
 
 	}
-
 }

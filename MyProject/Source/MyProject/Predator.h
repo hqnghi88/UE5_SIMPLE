@@ -17,8 +17,8 @@ private:
 	FVector position;
 	FRotator heading;
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* StaticMesh; //Graphical representation
-
+	USkeletalMeshComponent* StaticMesh; //Graphical representation 
+	UAnimationAsset* ANIM_Lion_Run;
 public:
 	bool dead=false;
 	FString fname;
